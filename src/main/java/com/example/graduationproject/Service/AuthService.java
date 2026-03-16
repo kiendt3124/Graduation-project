@@ -89,4 +89,46 @@ public class AuthService {
         }
         throw new RuntimeException("Loại Token không xác định");
     }
+
+
+    public String logout(String token) {
+        if (token == null || !jwtUtils.validateJwtToken(token)) {
+            throw new RuntimeException("Refresh Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại!");
+        }
+        String type = jwtUtils.getTypeFromToken(token);
+
+        if ("access".equals(type)) {
+            try {
+                String currentEmail = jwtUtils.getEmailFromToken(token);
+                User currentUser = userRepository.findByEmail(currentEmail).orElse(null);
+                if (currentUser == null) {
+                    throw new RuntimeException("lỗi token");
+                }else {
+                    currentUser.setRefreshToken(null);
+                    userRepository.save(currentUser);
+                    return "đăng xuất thành công";
+                }
+            }catch (Exception e){
+                throw new RuntimeException(e.getMessage());
+            }
+        }else if ("refresh".equals(type)) {
+            try {
+                User currentUser = userRepository.findByRefreshToken(token).orElse(null);
+                if(currentUser==null){
+                    throw new RuntimeException("lỗi token");
+
+                }else {
+                    currentUser.setRefreshToken(null);
+                    userRepository.save(currentUser);
+                    return "đăng xuất thành công";
+                }
+            }catch (Exception e){
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+
+        return "";
+
+    }
+
 }
