@@ -66,4 +66,27 @@ public class AuthService {
 
     }
 
+    public GoogleLoginResponse refreshToken(String refreshToken) {
+        if (refreshToken == null || !jwtUtils.validateJwtToken(refreshToken)) {
+            throw new RuntimeException("Refresh Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại!");
+        }
+
+        String type = jwtUtils.getTypeFromToken(refreshToken);
+        if ("access".equals(type)) {
+            throw new RuntimeException("Yêu cầu refresh token");
+        }else if ("refresh".equals(type)) {
+            User user = userRepository.findByRefreshToken(refreshToken).orElse(null);
+            if (user == null) {
+                throw new RuntimeException("Token không hợp lệ");
+            }else {
+                String newAccessToken = jwtUtils.createToken(user.getEmail(), user.getRole(), user.getAccountTier(), "access");
+                String newRefreshToken = jwtUtils.createToken(user.getEmail(), user.getRole(), user.getAccountTier(), "refresh");
+
+                user.setRefreshToken(newRefreshToken);
+                userRepository.save(user);
+                return new GoogleLoginResponse(newAccessToken,newRefreshToken,user.getEmail(),user.getRole().toString(),user.getAccountTier().toString());
+            }
+        }
+        throw new RuntimeException("Loại Token không xác định");
+    }
 }

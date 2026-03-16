@@ -27,18 +27,18 @@ public class JwtUtils {
         Date now = new Date();
         Date validTime;
         if (type.equals("access")) {
-            validTime = new Date(now.getTime() + 3600000L); //1 hour
-        }else if (type.equals("refresh")) {
-            validTime = new Date(now.getTime() + 2592000000L); //1 month
-        }else {
+            validTime = new Date(now.getTime() + 1800000L); // 1/2 hour
+        } else if (type.equals("refresh")) {
+            validTime = new Date(now.getTime() + 2592000000L); // 1 month
+        } else {
             throw new IllegalStateException("Invalid token type");
         }
 
         return Jwts.builder()
-                .claim("email",email)
-                .claim("role",role.toString())
+                .claim("email", email)
+                .claim("role", role.toString())
                 .claim("tier", tier.toString())
-                .claim("type",type)
+                .claim("type", type)
                 .setIssuedAt(now)
                 .setExpiration(validTime)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -53,7 +53,7 @@ public class JwtUtils {
                     .parseClaimsJws(token);
             return true;
 
-        } catch ( Exception e) {
+        } catch (Exception e) {
             System.out.println("Lỗi xác thực JWT: " + e.getMessage());
             return false;
         }
