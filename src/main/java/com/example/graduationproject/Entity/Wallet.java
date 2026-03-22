@@ -32,4 +32,6 @@ public class Wallet {
     @Column(name = "wallet_type")
     private WalletType walletType;
 
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isDeleted = Boolean.FALSE;
 }

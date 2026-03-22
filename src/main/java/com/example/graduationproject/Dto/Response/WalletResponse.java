@@ -9,9 +9,11 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class CreateWalletResponse {
+public class WalletResponse {
         private UUID id;
         private String name;
         private BigDecimal balance;
         private WalletType walletType;
+        private Boolean isDeleted;
+
 }
