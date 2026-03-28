@@ -35,7 +35,7 @@ public class User {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false,name = "account_tier")
+    @Column(nullable = false, name = "account_tier")
     private AccountTier accountTier;
 
     @Column(name = "refresh_token", length = 512)
@@ -44,6 +44,8 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wallet> wallets = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Budget> budgets = new ArrayList<>();
 }
-
-

@@ -11,6 +11,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - JWT_KEY=6gj3ijzRCKoZBfMWDghcHzAxjCcH4Kb7Z1XSzsBZM4z
+      - GOOGLE_CLIENT_ID=547880381048-lau7t5mle81d9ba1o0ed532c3qthmfam.apps.googleusercontent.com
     depends_on:
       postgres:
         condition: service_healthy
