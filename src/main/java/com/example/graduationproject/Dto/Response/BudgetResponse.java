@@ -38,7 +38,7 @@ public class BudgetResponse {
 
     /**
      * Tổng số tiền đã chi trong tháng cho category này.
-     * Được tính real-time từ bảng transactions (Option A).
+     * Được tính real-time từ bảng transactions
      */
     private BigDecimal spentAmount;
 
@@ -59,7 +59,7 @@ public class BudgetResponse {
     private BigDecimal dailySafeToSpend;
 
     /** true nếu spentAmount >= limitAmount */
-    private boolean isOverBudget;
+    private Boolean isOverBudget;
 
     /** Thời điểm tạo ngân sách */
     private LocalDateTime createdAt;

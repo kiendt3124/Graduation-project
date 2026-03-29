@@ -39,7 +39,7 @@ public class Budget {
     /**
      * Hạn mức chi tiêu cho tháng này.
      */
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(name = "budget_limit", nullable = false, precision = 19, scale = 2)
     private BigDecimal limit;
 
     /**

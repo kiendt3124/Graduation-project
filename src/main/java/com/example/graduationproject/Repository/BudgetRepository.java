@@ -1,7 +1,6 @@
 package com.example.graduationproject.Repository;
 
 import com.example.graduationproject.Entity.Budget;
-import com.example.graduationproject.Entity.Enum.TransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

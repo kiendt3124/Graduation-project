@@ -1,19 +1,12 @@
 package com.example.graduationproject.Dto.Request;
 
-import com.example.graduationproject.Entity.Enum.WalletType;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
-@AllArgsConstructor
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class GoogleLoginRequest {
     private String idToken;
-    private String name;
-    private BigDecimal balance;
-    private WalletType walletType;
 }
