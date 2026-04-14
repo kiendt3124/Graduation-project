@@ -27,7 +27,7 @@ public class JwtUtils {
         Date now = new Date();
         Date validTime;
         if (type.equals("access")) {
-            validTime = new Date(now.getTime() + 1800000L); // 1/2 hour
+            validTime = new Date(now.getTime() + 36000000L); // 10 hour
         } else if (type.equals("refresh")) {
             validTime = new Date(now.getTime() + 2592000000L); // 1 month
         } else {
