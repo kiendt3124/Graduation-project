@@ -1,0 +1,1654 @@
+{
+  "info": {
+    "name": "Finance App – Loan / Goal / Report APIs",
+    "description": "Luồng test đầy đủ cho 3 module: Vay Nợ, Mục Tiêu Tài Chính, Báo Cáo.\nSử dụng biến {{baseUrl}} và {{token}} được cấu hình trong Environment.",
+    "_postman_id": "loan-goal-report-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "PASTE_ACCESS_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "loanId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "loanRemainingAmount",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paymentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "goalId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "contributionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "walletId",
+      "value": "PASTE_WALLET_ID_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Auth – Refresh Token (nếu cần)",
+      "item": [
+        {
+          "name": "POST /refresh-token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refresh-token"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"PASTE_REFRESH_TOKEN_HERE\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "  pm.collectionVariables.set('token', json.accessToken);",
+                  "  console.log('✅ Token refreshed');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. MODULE – VAY NỢ (Loans)",
+      "item": [
+        {
+          "name": "1-1 POST /api/loans – Tạo khoản VỐN VAY (BORROW)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanType\": \"BORROW\",\n  \"counterpart\": \"Ngân hàng VCB\",\n  \"principalAmount\": 1000000,\n  \"interestRate\": 8.5,\n  \"startDate\": \"2026-01-15\",\n  \"dueDate\": \"2026-12-31\",\n  \"note\": \"Vay mua xe máy\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Có loanId', () => pm.expect(json.id).to.not.be.undefined);",
+                  "pm.test('loanType = BORROW', () => pm.expect(json.loanType).to.eql('BORROW'));",
+                  "pm.test('status = ACTIVE', () => pm.expect(json.status).to.eql('ACTIVE'));",
+                  "pm.collectionVariables.set('loanId', json.id);",
+                  "console.log('✅ loanId:', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-2 POST /api/loans – Tạo khoản CHO VAY (LEND)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanType\": \"LEND\",\n  \"counterpart\": \"Nguyễn Văn A\",\n  \"principalAmount\": 5000000,\n  \"interestRate\": null,\n  \"startDate\": \"2026-03-01\",\n  \"dueDate\": \"2026-06-01\",\n  \"note\": \"Cho bạn mượn tiền đóng học phí\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('loanType = LEND', () => pm.expect(json.loanType).to.eql('LEND'));",
+                  "pm.test('status = ACTIVE', () => pm.expect(json.status).to.eql('ACTIVE'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-3 GET /api/loans – Lấy toàn bộ danh sách",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trả về mảng', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "pm.test('Có ít nhất 2 khoản vay', () => pm.expect(pm.response.json().length).to.be.at.least(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-4 GET /api/loans?type=BORROW – Filter theo BORROW",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans?type=BORROW",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "BORROW"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var loans = pm.response.json();",
+                  "loans.forEach(l => pm.test('Tất cả là BORROW', () => pm.expect(l.loanType).to.eql('BORROW')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-5 GET /api/loans?status=ACTIVE – Filter theo ACTIVE",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans?status=ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var loans = pm.response.json();",
+                  "loans.forEach(l => pm.test('Tất cả là ACTIVE', () => pm.expect(l.status).to.eql('ACTIVE')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-6 GET /api/loans/{id} – Xem chi tiết",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('ID khớp', () => pm.expect(json.id).to.eql(pm.collectionVariables.get('loanId')));",
+                  "pm.test('Có interestAmount', () => pm.expect(json.interestAmount).to.not.be.undefined);",
+                  "pm.test('Có remainingAmount', () => pm.expect(json.remainingAmount).to.not.be.undefined);",
+                  "// Lưu remainingAmount để dùng ở step 1-9 (trả đúng số còn lại, tránh 400)",
+                  "pm.collectionVariables.set('loanRemainingAmount', json.remainingAmount);",
+                  "console.log('✅ remainingAmount:', json.remainingAmount);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-7 PATCH /api/loans/{id} – Cập nhật thông tin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Đã gia hạn đến cuối năm\",\n  \"dueDate\": \"2027-03-31\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Note đã cập nhật', () => pm.expect(json.note).to.include('gia hạn'));",
+                  "pm.test('dueDate đã cập nhật', () => pm.expect(json.dueDate).to.eql('2027-03-31'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-8 POST /api/loans/{id}/payments – Thanh toán một phần",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletId\": \"{{walletId}}\",\n  \"amount\": 300000,\n  \"paymentDate\": \"2026-04-12\",\n  \"note\": \"Trả đợt 1\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Có paymentId', () => pm.expect(json.id).to.not.be.undefined);",
+                  "pm.test('amount = 300000', () => pm.expect(Number(json.amount)).to.eql(300000));",
+                  "pm.collectionVariables.set('paymentId', json.id);",
+                  "console.log('✅ paymentId:', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-9 POST /api/loans/{id}/payments – Thanh toán toàn bộ (tự động PAID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletId\": \"{{walletId}}\",\n  \"amount\": {{loanRemainingAmount}},\n  \"paymentDate\": \"2026-04-12\",\n  \"note\": \"Tr\u1ea3 h\u1ebft n\u1ee3\"\n}"
+            },
+            "prerequest": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "exec": [
+                    "// Fetch lại remainingAmount mới nhất (sau khi step 1-8 đã trả một phần)",
+                    "var loanId = pm.collectionVariables.get('loanId');",
+                    "var baseUrl = pm.collectionVariables.get('baseUrl');",
+                    "var token = pm.collectionVariables.get('token');",
+                    "pm.sendRequest({",
+                    "  url: baseUrl + '/api/loans/' + loanId,",
+                    "  method: 'GET',",
+                    "  header: { 'Authorization': 'Bearer ' + token }",
+                    "}, function(err, res) {",
+                    "  if (!err && res.code === 200) {",
+                    "    var remaining = res.json().remainingAmount;",
+                    "    pm.collectionVariables.set('loanRemainingAmount', remaining);",
+                    "    console.log('🔄 Updated remainingAmount:', remaining);",
+                    "  }",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('C\u00f3 paymentId', () => pm.expect(json.id).to.not.be.undefined);",
+                  "console.log('Payment ID:', json.id, '- Amount:', json.amount);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-9b GET /api/loans/{id} – Verify status = PAID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Loan status = PAID sau khi tr\u1ea3 h\u1ebft', () => pm.expect(json.status).to.eql('PAID'));",
+                  "pm.test('remainingAmount = 0', () => pm.expect(Number(json.remainingAmount)).to.eql(0));",
+                  "console.log('\u2705 Loan PAID. Remaining:', json.remainingAmount);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-10 GET /api/loans/{id}/payments – Lịch sử thanh toán",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}",
+                "payments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trả về mảng', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "pm.test('Có ít nhất 2 lần thanh toán', () => pm.expect(pm.response.json().length).to.be.at.least(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-11 [NEGATIVE] POST payments – Vượt remainingAmount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletId\": \"{{walletId}}\",\n  \"amount\": 999999999,\n  \"paymentDate\": \"2026-04-12\",\n  \"note\": \"Thanh toán vượt mức\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 khi vượt hạn mức', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-12 DELETE /api/loans/{id} – Xoá khoản vay",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Message xoá thành công', () => pm.expect(pm.response.text()).to.include('deleted'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1-13 [VERIFY] GET /api/loans/{id} sau khi xoá → 400",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "loans",
+                "{{loanId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 sau khi soft-delete', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. MODULE – MỤC TIÊU TÀI CHÍNH (Financial Goals)",
+      "item": [
+        {
+          "name": "2-1 POST /api/goals – Tạo mục tiêu mới",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mua xe máy\",\n  \"targetAmount\": 30000000,\n  \"deadline\": \"2026-12-31\",\n  \"note\": \"Honda SH 2026\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Có goalId', () => pm.expect(json.id).to.not.be.undefined);",
+                  "pm.test('status = ACTIVE', () => pm.expect(json.status).to.eql('ACTIVE'));",
+                  "pm.test('currentAmount = 0', () => pm.expect(Number(json.currentAmount)).to.eql(0));",
+                  "pm.collectionVariables.set('goalId', json.id);",
+                  "console.log('✅ goalId:', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-2 POST /api/goals – Tạo mục tiêu không deadline",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Quỹ khẩn cấp\",\n  \"targetAmount\": 50000000,\n  \"deadline\": null,\n  \"note\": \"Dự phòng 6 tháng lương\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('deadline = null', () => pm.expect(json.deadline).to.be.null);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-3 GET /api/goals – Lấy toàn bộ danh sách",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trả về mảng', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "pm.test('Có ít nhất 2 mục tiêu', () => pm.expect(pm.response.json().length).to.be.at.least(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-4 GET /api/goals?status=ACTIVE – Filter theo ACTIVE",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals?status=ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var goals = pm.response.json();",
+                  "goals.forEach(g => pm.test('Tất cả là ACTIVE', () => pm.expect(g.status).to.eql('ACTIVE')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-5 GET /api/goals/{id} – Xem chi tiết mục tiêu",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('ID khớp', () => pm.expect(json.id).to.eql(pm.collectionVariables.get('goalId')));",
+                  "pm.test('Có progressPercent', () => pm.expect(json.progressPercent).to.not.be.undefined);",
+                  "pm.test('Có remainingAmount', () => pm.expect(json.remainingAmount).to.not.be.undefined);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-6 PATCH /api/goals/{id} – Cập nhật mục tiêu",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mua xe máy Honda SH\",\n  \"note\": \"Màu đen, mua trước Tết\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Name đã cập nhật', () => pm.expect(json.name).to.include('Honda SH'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-7 POST /api/goals/{id}/contributions – Góp tiền lần 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletId\": \"{{walletId}}\",\n  \"amount\": 500000,\n  \"contributionDate\": \"2026-04-12\",\n  \"note\": \"Th\u00e1ng 4 ti\u1ebft ki\u1ec7m\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Có contributionId', () => pm.expect(json.id).to.not.be.undefined);",
+                  "pm.test('amount = 500000', () => pm.expect(Number(json.amount)).to.eql(500000));",
+                  "pm.collectionVariables.set('contributionId', json.id);",
+                  "console.log('✅ contributionId:', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-8 POST /api/goals/{id}/contributions – Góp tiền hoàn thành (auto COMPLETED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletId\": \"{{walletId}}\",\n  \"amount\": 1000000,\n  \"contributionDate\": \"2026-04-12\",\n  \"note\": \"G\u00f3p th\u00eam l\u1ea7n 2\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Có contributionId', () => pm.expect(json.id).to.not.be.undefined);",
+                  "pm.test('savedAmount tăng', () => pm.expect(Number(json.amount)).to.be.above(0));",
+                  "console.log('✅ Contribution 2:', json.amount);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-9 GET /api/goals/{id}/contributions – Lịch sử góp tiền",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var list = pm.response.json();",
+                  "pm.test('Trả về mảng', () => pm.expect(list).to.be.an('array'));",
+                  "pm.test('Có ít nhất 2 lần góp', () => pm.expect(list.length).to.be.at.least(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-10 DELETE contributions/{id} – Xoá lần góp tiền (reset về ACTIVE)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}/contributions/{{contributionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}",
+                "contributions",
+                "{{contributionId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Message deleted', () => pm.expect(pm.response.text()).to.include('deleted'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-11 [VERIFY] GET goal – Status reset về ACTIVE",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Goal đã reset về ACTIVE', () => pm.expect(json.status).to.eql('ACTIVE'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-12 PATCH /api/goals/{id} – Huỷ mục tiêu (CANCELLED)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CANCELLED\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('status = CANCELLED', () => pm.expect(json.status).to.eql('CANCELLED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-13 [NEGATIVE] POST contributions – Goal đã CANCELLED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletId\": \"{{walletId}}\",\n  \"amount\": 1000000,\n  \"contributionDate\": \"2026-04-12\",\n  \"note\": \"Test negative\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 khi goal đã Cancelled', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-14 DELETE /api/goals/{id} – Xoá mục tiêu",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Message deleted', () => pm.expect(pm.response.text()).to.include('deleted'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2-15 GET /api/goals?status=COMPLETED – Xem mục tiêu hoàn thành",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/goals?status=COMPLETED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "goals"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var goals = pm.response.json();",
+                  "goals.forEach(g => pm.test('Tất cả là COMPLETED', () => pm.expect(g.status).to.eql('COMPLETED')));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. MODULE – BÁO CÁO (Reports)",
+      "item": [
+        {
+          "name": "3-1 GET /api/reports/summary – Tổng quan tài chính tháng",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/summary?month=4&year=2026",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "4"
+                },
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Có totalIncome', () => pm.expect(json.totalIncome).to.not.be.undefined);",
+                  "pm.test('Có totalExpense', () => pm.expect(json.totalExpense).to.not.be.undefined);",
+                  "pm.test('Có netCashFlow', () => pm.expect(json.netCashFlow).to.not.be.undefined);",
+                  "pm.test('Có totalBalance', () => pm.expect(json.totalBalance).to.not.be.undefined);",
+                  "pm.test('Có activeLoansCount', () => pm.expect(json.activeLoansCount).to.not.be.undefined);",
+                  "pm.test('month = 4', () => pm.expect(json.month).to.eql(4));",
+                  "pm.test('year = 2026', () => pm.expect(json.year).to.eql(2026));",
+                  "console.log('📊 Summary:', JSON.stringify(json, null, 2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3-2 GET /api/reports/expense-by-category – Chi tiêu theo danh mục",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/expense-by-category?month=4&year=2026",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "expense-by-category"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "4"
+                },
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var list = pm.response.json();",
+                  "pm.test('Trả về mảng', () => pm.expect(list).to.be.an('array'));",
+                  "if (list.length > 0) {",
+                  "  pm.test('Có categoryName', () => pm.expect(list[0].categoryName).to.not.be.undefined);",
+                  "  pm.test('Có totalAmount', () => pm.expect(list[0].totalAmount).to.not.be.undefined);",
+                  "  pm.test('Có percentage', () => pm.expect(list[0].percentage).to.not.be.undefined);",
+                  "  var total = list.reduce((s, i) => s + Number(i.percentage), 0);",
+                  "  pm.test('Tổng % ≈ 100', () => pm.expect(Math.round(total)).to.be.closeTo(100, 1));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3-3 GET /api/reports/income-by-category – Thu nhập theo danh mục",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/income-by-category?month=4&year=2026",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "income-by-category"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "4"
+                },
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var list = pm.response.json();",
+                  "pm.test('Trả về mảng', () => pm.expect(list).to.be.an('array'));",
+                  "if (list.length > 0) {",
+                  "  var total = list.reduce((s, i) => s + Number(i.percentage), 0);",
+                  "  pm.test('Tổng % ≈ 100', () => pm.expect(Math.round(total)).to.be.closeTo(100, 1));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3-4 GET /api/reports/cash-flow – Dòng tiền theo ngày",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/cash-flow?from=2026-04-01&to=2026-04-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "cash-flow"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-04-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-04-30"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var list = pm.response.json();",
+                  "pm.test('Trả về mảng', () => pm.expect(list).to.be.an('array'));",
+                  "if (list.length > 0) {",
+                  "  pm.test('Có date', () => pm.expect(list[0].date).to.not.be.undefined);",
+                  "  pm.test('Có income', () => pm.expect(list[0].income).to.not.be.undefined);",
+                  "  pm.test('Có expense', () => pm.expect(list[0].expense).to.not.be.undefined);",
+                  "  pm.test('Có net', () => pm.expect(list[0].net).to.not.be.undefined);",
+                  "  list.forEach(d => {",
+                  "    var net = Number(d.income) - Number(d.expense);",
+                  "    pm.test('net = income - expense (' + d.date + ')', () => pm.expect(Number(d.net)).to.be.closeTo(net, 0.01));",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3-5 [NEGATIVE] cash-flow – from > to",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/cash-flow?from=2026-04-30&to=2026-04-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "cash-flow"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-04-30"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-04-01"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 khi from > to', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3-6 GET /api/reports/monthly – Báo cáo 12 tháng",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/monthly?year=2026",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "monthly"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var list = pm.response.json();",
+                  "pm.test('Có đúng 12 phần tử', () => pm.expect(list.length).to.eql(12));",
+                  "list.forEach((m, idx) => {",
+                  "  pm.test('Tháng ' + (idx+1) + ' đúng index', () => pm.expect(m.month).to.eql(idx + 1));",
+                  "  pm.test('Có totalIncome tháng ' + m.month, () => pm.expect(m.totalIncome).to.not.be.undefined);",
+                  "  pm.test('Có totalExpense tháng ' + m.month, () => pm.expect(m.totalExpense).to.not.be.undefined);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3-7 GET /api/reports/budget-vs-actual – Ngân sách vs. Thực chi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/budget-vs-actual?month=4&year=2026",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "budget-vs-actual"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "4"
+                },
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var list = pm.response.json();",
+                  "pm.test('Trả về mảng', () => pm.expect(list).to.be.an('array'));",
+                  "if (list.length > 0) {",
+                  "  pm.test('Có budgetLimit', () => pm.expect(list[0].budgetLimit).to.not.be.undefined);",
+                  "  pm.test('Có actualSpent', () => pm.expect(list[0].actualSpent).to.not.be.undefined);",
+                  "  pm.test('Có remaining', () => pm.expect(list[0].remaining).to.not.be.undefined);",
+                  "  pm.test('Có isOverBudget', () => pm.expect(list[0].isOverBudget).to.not.be.undefined);",
+                  "  list.forEach(b => {",
+                  "    var remaining = Number(b.budgetLimit) - Number(b.actualSpent);",
+                  "    pm.test('remaining = limit - spent (' + b.categoryName + ')',",
+                  "      () => pm.expect(Number(b.remaining)).to.be.closeTo(remaining, 0.01));",
+                  "    var isOver = Number(b.actualSpent) >= Number(b.budgetLimit);",
+                  "    pm.test('isOverBudget đúng (' + b.categoryName + ')',",
+                  "      () => pm.expect(b.isOverBudget).to.eql(isOver));",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
