@@ -28,10 +28,10 @@ public class BudgetResponse {
     private String categoryIcon;
 
     /** Tháng áp dụng (1–12) */
-    private int month;
+    private Integer month;
 
     /** Năm áp dụng */
-    private int year;
+    private Integer year;
 
     /** Hạn mức đã đặt */
     private BigDecimal limitAmount;
