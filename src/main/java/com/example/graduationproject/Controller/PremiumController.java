@@ -139,4 +139,42 @@ public class PremiumController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // ===================================================
+    // GET /premium/test — Test nhanh quyền theo tier
+    // ===================================================
+    @Operation(
+        summary = "[TEST] Kiểm tra quyền Premium",
+        description = "Trả về nội dung khác nhau tùy user là BASIC hay PREMIUM. " +
+                      "Dùng để kiểm tra chức năng mua Premium hoạt động đúng chưa.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "PREMIUM — có quyền truy cập"),
+            @ApiResponse(responseCode = "403", description = "BASIC — không có quyền")
+        }
+    )
+    @GetMapping("/test")
+    public ResponseEntity<?> testPremiumAccess(Authentication authentication) {
+        try {
+            String email = (String) authentication.getPrincipal();
+            PremiumStatusResponse status = premiumService.getStatus(email);
+
+            if ("PREMIUM".equals(status.getTier()) && !status.isExpired()) {
+                return ResponseEntity.ok(Map.of(
+                        "access", true,
+                        "message", "✅ Bạn đang dùng gói PREMIUM",
+                        "tier", "PREMIUM",
+                        "expiredAt", status.getExpiredAt() != null ? status.getExpiredAt().toString() : ""
+                ));
+            } else {
+                return ResponseEntity.status(403).body(Map.of(
+                        "access", false,
+                        "message", "❌ Tính năng này yêu cầu gói Premium. Nâng cấp tại POST /premium/initiate",
+                        "tier", status.getTier()
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
+
