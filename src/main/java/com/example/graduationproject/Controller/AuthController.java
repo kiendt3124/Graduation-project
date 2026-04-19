@@ -1,5 +1,6 @@
 package com.example.graduationproject.Controller;
 
+import com.example.graduationproject.Dto.Request.AdminLoginRequest;
 import com.example.graduationproject.Dto.Request.GoogleLoginRequest;
 import com.example.graduationproject.Dto.Request.RefreshTokenRequest;
 import com.example.graduationproject.Dto.Response.GoogleLoginResponse;
@@ -10,9 +11,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @Tag(name = "Auth", description = "Đăng nhập, làm mới token, đăng xuất")
@@ -35,6 +39,26 @@ public class AuthController {
     @PostMapping("/google")
     public ResponseEntity<GoogleLoginResponse> googleLogin(@RequestBody GoogleLoginRequest googleLoginRequest) {
         return ResponseEntity.ok(authService.googleLogin(googleLoginRequest.getIdToken()));
+    }
+
+    @Operation(
+        summary = "Đăng nhập Admin",
+        description = "Đăng nhập bằng username/password được cấu hình trong server. " +
+                      "Trả về JWT accessToken với role=ADMIN để dùng cho các API /api/admin/**.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Đăng nhập thành công — trả về accessToken, refreshToken"),
+            @ApiResponse(responseCode = "401", description = "Username hoặc password không đúng")
+        }
+    )
+    @SecurityRequirements   // Không cần Bearer token
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> adminLogin(@Valid @RequestBody AdminLoginRequest request) {
+        try {
+            Map<String, String> result = authService.adminLogin(request.getUsername(), request.getPassword());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        }
     }
 
     @Operation(

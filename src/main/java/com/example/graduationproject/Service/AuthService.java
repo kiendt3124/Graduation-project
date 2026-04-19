@@ -14,13 +14,21 @@ import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Map;
 
 @Service
 public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
     private final GoogleIdTokenVerifier verifier;
+
+    @Value("${admin.username:admin}")
+    private String adminUsername;
+
+    @Value("${admin.password:admin}")
+    private String adminPassword;
 
     public AuthService(@Value("${google.client.id}") String clientId, UserRepository userRepository,
             JwtUtils jwtUtils) {
@@ -29,6 +37,25 @@ public class AuthService {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(clientId))
                 .build();
+    }
+
+    // ===================================================
+    // Admin Login (username + password từ config)
+    // ===================================================
+    public Map<String, String> adminLogin(String username, String password) {
+        if (!adminUsername.equals(username) || !adminPassword.equals(password)) {
+            throw new RuntimeException("Username hoặc password không đúng.");
+        }
+
+        String accessToken  = jwtUtils.createToken(adminUsername, Role.ADMIN, AccountTier.BASIC, "access");
+        String refreshToken = jwtUtils.createToken(adminUsername, Role.ADMIN, AccountTier.BASIC, "refresh");
+
+        return Map.of(
+                "accessToken",  accessToken,
+                "refreshToken", refreshToken,
+                "username",     adminUsername,
+                "role",         "ADMIN"
+        );
     }
 
     public GoogleLoginResponse googleLogin(String idTokenByClient) {
@@ -50,10 +77,17 @@ public class AuthService {
         User user = userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = new User();
             newUser.setEmail(email);
+            newUser.setGoogleId(payload.getSubject());
             newUser.setRole(Role.USER);
             newUser.setAccountTier(AccountTier.BASIC);
+            newUser.setCreatedAt(LocalDateTime.now());
             return userRepository.save(newUser);
         });
+
+        // Từ chối đăng nhập nếu tài khoản bị banned
+        if (user.isBanned()) {
+            throw new RuntimeException("Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.");
+        }
 
         String accessToken = jwtUtils.createToken(email, user.getRole(), user.getAccountTier(), "access");
         String refreshToken = jwtUtils.createToken(email, user.getRole(), user.getAccountTier(), "refresh");

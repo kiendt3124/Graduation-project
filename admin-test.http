@@ -1,0 +1,114 @@
+### =============================================
+### Admin Module — Test Endpoints
+### =============================================
+### Hướng dẫn dùng:
+###   - VS Code: cài extension "REST Client" (Huachao Mao)
+###   - IntelliJ: dùng built-in HTTP Client
+###   - Thay {{BASE_URL}} và {{ADMIN_TOKEN}} bên dưới
+### =============================================
+
+@BASE_URL = http://localhost:8080
+@ADMIN_TOKEN = eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwidGllciI6IkJBU0lDIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3NjU4MTQxMSwiZXhwIjoxNzc2NjE3NDExfQ.dJlpwGTYJtwoiFBCivHgsEz6W3nErDcD6eSLS9PPPM4
+### ─── BƯỚC 0: ĐĂNG NHẬP ADMIN ───────────────────────────────────────────────
+
+### 0.1. Đăng nhập Admin — copy accessToken vào @ADMIN_TOKEN bên trên
+# Kỳ vọng: 200 OK — { accessToken, refreshToken, username, role }
+POST {{BASE_URL}}/admin/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+### 0.2. Test sai password
+# Kỳ vọng: 401 Unauthorized — "Username hoặc password không đúng."
+POST {{BASE_URL}}/admin/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "wrongpassword"
+}
+
+### ─── BƯỚC 1: THỐNG KÊ HỆ THỐNG ─────────────────────────────────────────────
+
+### 1.1. Lấy thống kê tổng quan (dashboard)
+# Kỳ vọng: 200 OK — totalUsers, totalBasicUsers, totalPremiumUsers, totalBannedUsers,
+#           totalRevenue, newUsersLast7Days (7 phần tử)
+GET {{BASE_URL}}/api/admin/stats
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### ─── BƯỚC 2: QUẢN LÝ NGƯỜI DÙNG ────────────────────────────────────────────
+
+### 2.1. Lấy danh sách tất cả users (trang 1, 10 phần tử)
+# Kỳ vọng: 200 OK — Page object với content[], totalElements, totalPages
+GET {{BASE_URL}}/api/admin/users?page=0&size=10
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### 2.2. Tìm kiếm user theo email
+# Kỳ vọng: 200 OK — chỉ trả về users có email chứa "gmail"
+GET {{BASE_URL}}/api/admin/users?email=gmail&page=0&size=10
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### 2.3. Xem chi tiết user theo ID
+# Thay UUID bằng id lấy từ kết quả bước 2.1
+# Kỳ vọng: 200 OK — AdminUserDetailResponse với walletCount, transactionCount, goalCount...
+GET {{BASE_URL}}/api/admin/users/d408748d-16d2-4f95-8f6b-ae9954fb1b7f
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### 2.4. Ban một user
+# Kỳ vọng: 200 OK — isBanned = true trong response
+# Sau khi ban, user đó đăng nhập lại sẽ nhận lỗi "Tài khoản đã bị vô hiệu hóa"
+PUT {{BASE_URL}}/api/admin/users/PASTE_USER_UUID_HERE/ban
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### 2.5. Unban user đó
+# Kỳ vọng: 200 OK — isBanned = false trong response
+PUT {{BASE_URL}}/api/admin/users/PASTE_USER_UUID_HERE/unban
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### ─── BƯỚC 3: QUẢN LÝ ĐƠN PREMIUM ──────────────────────────────────────────
+
+### 3.1. Lấy tất cả đơn Premium (không lọc)
+# Kỳ vọng: 200 OK — Page object với adminPremiumOrderResponse (có userEmail)
+GET {{BASE_URL}}/api/admin/premium/orders?page=0&size=10
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### 3.2. Lọc đơn theo status = COMPLETED
+# Kỳ vọng: 200 OK — chỉ trả về đơn đã thanh toán
+GET {{BASE_URL}}/api/admin/premium/orders?status=COMPLETED&page=0&size=10
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### 3.3. Lọc đơn theo status = PENDING
+GET {{BASE_URL}}/api/admin/premium/orders?status=PENDING&page=0&size=10
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### 3.4. Test với status không hợp lệ
+# Kỳ vọng: 400 Bad Request — "Trạng thái không hợp lệ: ABC..."
+GET {{BASE_URL}}/api/admin/premium/orders?status=ABC&page=0&size=10
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### ─── BƯỚC 4: THỐNG KÊ DOANH THU ────────────────────────────────────────────
+
+### 4.1. Doanh thu năm 2026
+# Kỳ vọng: 200 OK — totalRevenue, monthlyRevenue, yearlyRevenue, monthlyBreakdown[]
+GET {{BASE_URL}}/api/admin/premium/revenue?year=2026
+Authorization: Bearer {{ADMIN_TOKEN}}
+
+### ─── BƯỚC 5: KIỂM TRA BẢO MẬT ─────────────────────────────────────────────
+
+### 5.1. Gọi admin API không có token
+# Kỳ vọng: 403 Forbidden
+GET {{BASE_URL}}/api/admin/stats
+
+### 5.2. Gọi admin API bằng token của USER thường (không phải ADMIN)
+# Lấy token từ user thường (role=USER), paste vào đây
+# Kỳ vọng: 403 Forbidden
+GET {{BASE_URL}}/api/admin/stats
+Authorization: Bearer PASTE_REGULAR_USER_TOKEN_HERE
+
+### 5.3. Cố gắng ban tài khoản Admin
+# Kỳ vọng: 400 Bad Request — "Không thể ban tài khoản Admin"
+PUT {{BASE_URL}}/api/admin/users/PASTE_ADMIN_USER_UUID_HERE/ban
+Authorization: Bearer {{ADMIN_TOKEN}}

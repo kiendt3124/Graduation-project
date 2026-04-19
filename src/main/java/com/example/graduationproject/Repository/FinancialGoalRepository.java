@@ -20,4 +20,8 @@ public interface FinancialGoalRepository extends JpaRepository<FinancialGoal, UU
 
     /** Tìm 1 goal chưa xoá theo id */
     Optional<FinancialGoal> findByIdAndIsDeletedFalse(UUID id);
+
+    /** Đếm tổng goal của user (cho admin stats) */
+    long countByUserId(UUID userId);
 }
+

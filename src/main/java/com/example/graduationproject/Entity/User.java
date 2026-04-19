@@ -58,6 +58,13 @@ public class User {
     private LocalDateTime premiumExpiredAt;  // null nếu BASIC
 
     @Builder.Default
+    @Column(name = "is_banned", nullable = false, columnDefinition = "boolean default false")
+    private boolean isBanned = false;  // Admin có thể vô hiệu hóa tài khoản
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;   // Thời điểm tạo tài khoản (dùng cho thống kê)
+
+    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PremiumOrder> premiumOrders = new ArrayList<>();
 }
