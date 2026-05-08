@@ -1,0 +1,62 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <capability
+        android:name="custom.actions.intent.ADD_EXPENSE"
+        app:queryPatterns="@array/expenseQueries">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity"
+            android:targetPackage="com.uet.expensetracker">
+            <url-template android:value="expensetracker://addexpense{?amount,category,date}" />
+            <parameter
+                android:name="amount"
+                android:key="amount"
+                android:mimeType="https://schema.org/Number" />
+            <parameter
+                android:name="category"
+                android:key="category"
+                android:mimeType="https://schema.org/Text" />
+
+            <parameter
+                android:name="date"
+                android:key="date"
+                android:mimeType="https://schema.org/Date" />
+        </intent>
+    </capability>
+
+    <shortcut
+        android:shortcutId="add_eating_expense"
+        android:shortcutShortLabel="@string/add_eating_transaction_label">
+        <capability-binding android:key="custom.actions.intent.ADD_EXPENSE">
+            <parameter-binding
+                android:key="category1"
+                android:value="@array/food_category_synonyms"/>
+            <parameter-binding
+                android:key="amount1"
+                android:value="@array/amount_synonyms"/>
+        </capability-binding>
+    </shortcut>
+
+<!--    ========= Open Adding Transaction Feature   ==========-->
+    <capability
+        android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity"
+            android:targetPackage="com.uet.expensetracker">
+            <parameter
+                android:name="feature"
+                android:key="feature" />
+        </intent>
+    </capability>
+
+    <shortcut
+        android:shortcutId="show_add_transaction"
+        android:shortcutShortLabel="@string/add_transaction_label">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/add_transaction_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+</shortcuts>

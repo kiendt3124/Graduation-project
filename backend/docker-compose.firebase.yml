@@ -1,0 +1,12 @@
+services:
+  app:
+    # Mount a Firebase service account JSON into the container and point ADC at it.
+    # Usage (PowerShell):
+    #   $env:GOOGLE_APPLICATION_CREDENTIALS="D:/keys/your-sa.json"
+    #   docker compose -f docker-compose.yml -f docker-compose.firebase.yml up --build
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/firebase-sa.json
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/secrets/firebase-sa.json:ro
+
+

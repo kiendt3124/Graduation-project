@@ -1,0 +1,41 @@
+[
+  {
+    "lang": [
+      "all"
+    ],
+    "startDate": "2024-12-01",
+    "endDate": "2024-12-25",
+    "overlay": "add_button_overlay_snow",
+    "src": "add_button_xmas_hat"
+  },
+  {
+    "lang": [
+      "all"
+    ],
+    "startDate": "2024-12-26",
+    "endDate": "2025-01-06",
+    "overlay": "add_button_overlay_fireworks",
+    "src": ""
+  },
+  {
+    "lang": [
+      "all"
+    ],
+    "startDate": "2025-02-12",
+    "endDate": "2025-02-14",
+    "overlay": "",
+    "src": "anim_addtransaction_valentine.json"
+  },
+  {
+    "lang": [
+      "vi",
+      "zh",
+      "ko",
+      "ja"
+    ],
+    "startDate": "2025-01-08",
+    "endDate": "2025-02-05",
+    "overlay": "",
+    "src": "anim_addtransaction_tet.json"
+  }
+]

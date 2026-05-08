@@ -1,0 +1,264 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <capability
+        android:name="custom.actions.intent.ADD_EXPENSE"
+        app:queryPatterns="@array/expenseQueries">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity"
+            android:targetPackage="com.uet.expensetracker">
+            <url-template android:value="expensetracker://addexpense{?amount,category,date}" />
+            <parameter
+                android:name="amount"
+                android:key="amount"
+                android:mimeType="https://schema.org/Number" />
+            <parameter
+                android:name="category"
+                android:key="category"
+                android:mimeType="https://schema.org/Text" />
+
+            <parameter
+                android:name="date"
+                android:key="date"
+                android:mimeType="https://schema.org/Date" />
+
+            <!-- The following parameter has no type because the shortcuts are bound to it -->
+<!--            <parameter android:name="apptType" android:key="apptType" />-->
+        </intent>
+    </capability>
+
+    <shortcut
+        android:shortcutId="add_eating_transaction"
+        android:shortcutShortLabel="@string/add_eating_transaction_label">
+        <capability-binding android:key="custom.actions.intent.ADD_EXPENSE">
+            <parameter-binding
+                android:key="apptType"
+                android:value="@array/food_category_synonyms"/>
+        </capability-binding>
+    </shortcut>
+
+<!--    ========= Open Adding Transaction Feature   ==========-->
+    <capability
+        android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity"
+            android:targetPackage="com.uet.expensetracker">
+            <url-template android:value="expensetracker://open_feature?feature={feature}" />
+            <parameter
+                android:name="feature"
+                android:key="feature" />
+        </intent>
+    </capability>
+
+    <shortcut
+        android:shortcutId="show_add_transaction"
+        android:shortcutShortLabel="@string/add_transaction_label">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/add_transaction_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="show_all_wallets"
+        android:shortcutShortLabel="@string/show_all_wallets_label">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/all_wallets_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+
+<!--    show_list_transaction-->
+    <shortcut
+        android:shortcutId="show_list_transaction"
+        android:shortcutShortLabel="@string/show_list_transaction">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/transaction_list_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="show_budget_screen"
+        android:shortcutShortLabel="@string/show_running_budgets">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/budget_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="show_account_screen"
+        android:shortcutShortLabel="@string/show_account_label">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/account_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="show_currency_screen"
+        android:shortcutShortLabel="@string/show_currency_label">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/currency_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="show_debt_management_screen"
+        android:shortcutShortLabel="@string/show_debt_label">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/debt_management_feature_synonyms" />
+        </capability-binding>
+    </shortcut>
+
+
+    <capability
+        android:name="custom.actions.intent.TOTAL_EXPENSE"
+        app:queryPatterns="@array/dateExpenseQueries">
+        <app-widget
+            android:identifier="TOTAL_EXPENSE_WIDGET"
+            android:targetClass="com.uet.expensetracker.widgets.TotalExpenseAppWidgetProvider">
+            <parameter
+                android:name="date"
+                android:key="date"
+                android:mimeType="https://schema.org/Date" />
+
+        </app-widget>
+        <intent
+            android:identifier="TOTAL_EXPENSE_FALLBACK"
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">
+        </intent>
+    </capability>
+
+    <!-- Get Balance Intent -->
+    <capability
+        android:name="custom.actions.intent.GET_BALANCE"
+        app:queryPatterns="@array/balanceQueries">
+      <app-widget
+          android:identifier="BALANCE_WIDGET"
+          android:targetClass="com.uet.expensetracker.widgets.BalanceAppWidgetProvider" />
+      <intent
+          android:identifier="GET_BALANCE_FALLBACK"
+          android:action="android.intent.action.VIEW"
+          android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">
+        <url-template android:value="expensetracker://balance" />
+      </intent>
+    </capability>
+
+    <!-- Weekly Expense Intent -->
+    <capability
+        android:name="custom.actions.intent.WEEKLY_EXPENSE"
+        app:queryPatterns="@array/weeklyQueries">
+      <app-widget
+          android:identifier="WEEKLY_EXPENSE_WIDGET"
+          android:targetClass="com.uet.expensetracker.widgets.WeeklyExpenseAppWidgetProvider" />
+      <intent
+          android:identifier="WEEKLY_EXPENSE_FALLBACK"
+          android:action="android.intent.action.VIEW"
+          android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">
+        <url-template android:value="expensetracker://weeklyexpense" />
+      </intent>
+    </capability>
+<!--    <shortcut-->
+<!--        android:shortcutId="show_weekly_expense"-->
+<!--        android:shortcutShortLabel="@string/show_weekly_expense_label">-->
+<!--      <capability-binding android:key="custom.actions.intent.WEEKLY_EXPENSE" />-->
+<!--    </shortcut>-->
+    <!-- Monthly Expense Intent -->
+    <capability
+        android:name="custom.actions.intent.MONTHLY_EXPENSE"
+        app:queryPatterns="@array/monthlyQueries">
+      <app-widget
+          android:identifier="MONTHLY_EXPENSE_WIDGET"
+          android:targetClass="com.uet.expensetracker.widgets.MonthlyExpenseAppWidgetProvider" />
+      <intent
+          android:identifier="MONTHLY_EXPENSE_FALLBACK"
+          android:action="android.intent.action.VIEW"
+          android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">
+        <url-template android:value="expensetracker://monthlyexpense" />
+      </intent>
+    </capability>
+    <!-- <shortcut
+        android:shortcutId="show_monthly_expense"
+        android:shortcutShortLabel="@string/show_monthly_expense_label">
+      <capability-binding android:key="custom.actions.intent.MONTHLY_EXPENSE" />
+    </shortcut> -->
+    <!-- Category Expense Intent -->
+    <capability
+        android:name="custom.actions.intent.CATEGORY_EXPENSE"
+        app:queryPatterns="@array/categoryExpenseQueries">
+      <app-widget
+          android:identifier="CATEGORY_EXPENSE_WIDGET"
+          android:targetClass="com.uet.expensetracker.widgets.CategoryExpenseAppWidgetProvider">
+        <parameter
+            android:name="category"
+            android:key="category"
+            android:mimeType="https://schema.org/Text" />
+      </app-widget>
+<!--      <intent-->
+<!--          android:identifier="CATEGORY_EXPENSE_FALLBACK"-->
+<!--          android:action="android.intent.action.VIEW"-->
+<!--          android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">-->
+<!--        <url-template android:value="expensetracker://categoryexpense?category={category}" />-->
+<!--        <parameter-->
+<!--            android:name="category"-->
+<!--            android:key="category"-->
+<!--            android:mimeType="https://schema.org/Text" />-->
+<!--      </intent>-->
+    </capability>
+    <!-- Today's Income Intent -->
+    <capability
+        android:name="custom.actions.intent.TODAYS_INCOME"
+        app:queryPatterns="@array/incomeQueries">
+      <app-widget
+          android:identifier="TODAYS_INCOME_WIDGET"
+          android:targetClass="com.uet.expensetracker.widgets.TodayIncomeAppWidgetProvider" />
+      <intent
+          android:identifier="TODAYS_INCOME_FALLBACK"
+          android:action="android.intent.action.VIEW"
+          android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">
+        <url-template android:value="expensetracker://todayincome" />
+      </intent>
+    </capability>
+    <!-- Top Spending Category Intent -->
+    <capability
+        android:name="custom.actions.intent.TOP_SPENDING_CATEGORY"
+        app:queryPatterns="@array/topCategoryQueries">
+      <app-widget
+          android:identifier="TOP_SPENDING_CATEGORY_WIDGET"
+          android:targetClass="com.uet.expensetracker.widgets.TopSpendingCategoryAppWidgetProvider" />
+      <intent
+          android:identifier="TOP_SPENDING_CATEGORY_FALLBACK"
+          android:action="android.intent.action.VIEW"
+          android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">
+        <url-template android:value="expensetracker://topcategory" />
+      </intent>
+    </capability>
+    <!-- Budget Usage Intent -->
+    <capability
+        android:name="custom.actions.intent.BUDGET_USAGE"
+        app:queryPatterns="@array/budgetUsageQueries">
+      <app-widget
+          android:identifier="BUDGET_USAGE_WIDGET"
+          android:targetClass="com.uet.expensetracker.widgets.BudgetUsageAppWidgetProvider" />
+      <intent
+          android:identifier="BUDGET_USAGE_FALLBACK"
+          android:action="android.intent.action.VIEW"
+          android:targetClass="com.uet.expensetracker.features.money.ui.navigation.MainActivity">
+        <url-template android:value="expensetracker://budgetusage" />
+      </intent>
+    </capability>
+
+</shortcuts>

@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="food_category_synonyms">
+        <item>eating</item>
+        <item>food</item>
+        <item>dining</item>
+        <item>meals</item>
+        <item>lunch</item>
+        <item>dinner</item>
+        <item>breakfast</item>
+        <item>snacks</item>
+        <item>cuisine</item>
+        <item>drink</item>
+    </string-array>
+
+    <string-array name="utilities_category_synonyms">
+        <item>utilities</item>
+        <item>bills</item>
+        <item>electricity</item>
+        <item>water</item>
+        <item>gas</item>
+        <item>phone</item>
+        <item>internet</item>
+        <item>rent</item>
+        <item>service</item>
+        <item>charge</item>
+    </string-array>
+
+    <string-array name="shopping_category_synonyms">
+        <item>shopping</item>
+        <item>purchase</item>
+        <item>buying</item>
+        <item>retail</item>
+        <item>mall</item>
+        <item>shop</item>
+        <item>spree</item>
+        <item>cart</item>
+        <item>checkout</item>
+        <item>spend</item>
+    </string-array>
+
+    <string-array name="family_category_synonyms">
+        <item>family</item>
+        <item>home</item>
+        <item>household</item>
+        <item>relatives</item>
+        <item>domestic</item>
+        <item>kin</item>
+        <item>parents</item>
+        <item>children</item>
+        <item>housing</item>
+        <item>living</item>
+    </string-array>
+
+    <string-array name="transport_category_synonyms">
+        <item>transport</item>
+        <item>travel</item>
+        <item>commuting</item>
+        <item>transit</item>
+        <item>bus</item>
+        <item>taxi</item>
+        <item>train</item>
+        <item>ride</item>
+        <item>journey</item>
+        <item>commute</item>
+    </string-array>
+
+    <string-array name="medical_category_synonyms">
+        <item>medical</item>
+        <item>health</item>
+        <item>fitness</item>
+        <item>healthcare</item>
+        <item>doctor</item>
+        <item>hospital</item>
+        <item>treatment</item>
+        <item>clinic</item>
+        <item>medicine</item>
+        <item>checkup</item>
+    </string-array>
+
+    <string-array name="education_category_synonyms">
+        <item>education</item>
+        <item>schooling</item>
+        <item>learning</item>
+        <item>tuition</item>
+        <item>training</item>
+        <item>classes</item>
+        <item>study</item>
+        <item>courses</item>
+        <item>lecture</item>
+        <item>seminar</item>
+    </string-array>
+
+    <string-array name="entertainment_category_synonyms">
+        <item>entertainment</item>
+        <item>leisure</item>
+        <item>fun</item>
+        <item>movies</item>
+        <item>games</item>
+        <item>music</item>
+        <item>show</item>
+        <item>concert</item>
+        <item>theatre</item>
+        <item>amusement</item>
+    </string-array>
+
+    <string-array name="donation_category_synonyms">
+        <item>donation</item>
+        <item>charity</item>
+        <item>gift</item>
+        <item>contribution</item>
+        <item>philanthropy</item>
+        <item>giving</item>
+        <item>benevolence</item>
+        <item>fundraiser</item>
+        <item>support</item>
+        <item>offering</item>
+    </string-array>
+
+    <string-array name="insurance_category_synonyms">
+        <item>insurance</item>
+        <item>premium</item>
+        <item>policy</item>
+        <item>coverage</item>
+        <item>claim</item>
+        <item>risk</item>
+        <item>insured</item>
+        <item>protection</item>
+        <item>liability</item>
+        <item>assurance</item>
+    </string-array>
+
+    <string-array name="invest_category_synonyms">
+        <item>invest</item>
+        <item>investment</item>
+        <item>stocks</item>
+        <item>bonds</item>
+        <item>portfolio</item>
+        <item>savings</item>
+        <item>finance</item>
+        <item>fund</item>
+        <item>capital</item>
+        <item>asset</item>
+    </string-array>
+
+    <string-array name="expense_other_category_synonyms">
+        <item>miscellaneous</item>
+        <item>other</item>
+        <item>sundry</item>
+        <item>various</item>
+        <item>incidentals</item>
+        <item>odd</item>
+        <item>misc</item>
+        <item>extra</item>
+        <item>unclassified</item>
+        <item>diverse</item>
+    </string-array>
+
+    <string-array name="outgoing_transfer_category_synonyms">
+        <item>outgoing transfer</item>
+        <item>payment</item>
+        <item>send</item>
+        <item>remittance</item>
+        <item>wire</item>
+        <item>payout</item>
+        <item>transfer out</item>
+        <item>dispatch</item>
+        <item>transmit</item>
+        <item>transfer</item>
+    </string-array>
+
+    <string-array name="loan_category_synonyms">
+        <item>loan</item>
+        <item>borrowing</item>
+        <item>credit</item>
+        <item>borrow</item>
+        <item>debt</item>
+        <item>advance</item>
+        <item>lending</item>
+        <item>finance</item>
+        <item>installment</item>
+        <item>loan payment</item>
+    </string-array>
+
+    <string-array name="repayment_category_synonyms">
+        <item>repayment</item>
+        <item>payback</item>
+        <item>refund</item>
+        <item>reimbursement</item>
+        <item>settle</item>
+        <item>pay off</item>
+        <item>amortization</item>
+        <item>settlement</item>
+        <item>pay debt</item>
+        <item>reimburse</item>
+    </string-array>
+
+    <string-array name="pay_interest_category_synonyms">
+        <item>interest</item>
+        <item>interest payment</item>
+        <item>finance charge</item>
+        <item>interest fee</item>
+        <item>interest cost</item>
+        <item>interest rate</item>
+        <item>APR</item>
+        <item>interest charge</item>
+        <item>accrued interest</item>
+        <item>finance cost</item>
+    </string-array>
+
+    <string-array name="salary_category_synonyms">
+        <item>salary</item>
+        <item>wage</item>
+        <item>pay</item>
+        <item>income</item>
+        <item>paycheck</item>
+        <item>earnings</item>
+        <item>stipend</item>
+        <item>compensation</item>
+        <item>remuneration</item>
+        <item>salary payment</item>
+    </string-array>
+
+    <string-array name="debt_category_synonyms">
+        <item>debt</item>
+        <item>owing</item>
+        <item>liability</item>
+        <item>dues</item>
+        <item>arrears</item>
+        <item>obligation</item>
+        <item>owed</item>
+        <item>indebtedness</item>
+        <item>outstanding</item>
+        <item>debt balance</item>
+    </string-array>
+
+    <string-array name="debt_collection_category_synonyms">
+        <item>debt collection</item>
+        <item>collection</item>
+        <item>collector</item>
+        <item>recovery</item>
+        <item>debt recovery</item>
+        <item>collection agency</item>
+        <item>collections</item>
+        <item>debt actions</item>
+        <item>debt agency</item>
+        <item>recover</item>
+    </string-array>
+
+    <string-array name="income_other_category_synonyms">
+        <item>other income</item>
+        <item>miscellaneous income</item>
+        <item>extra income</item>
+        <item>side income</item>
+        <item>additional income</item>
+        <item>bonus</item>
+        <item>commission</item>
+        <item>dividends</item>
+        <item>rental income</item>
+        <item>interest income</item>
+    </string-array>
+
+    <string-array name="incoming_transfer_category_synonyms">
+        <item>incoming transfer</item>
+        <item>deposit</item>
+        <item>receive</item>
+        <item>remittance</item>
+        <item>credit</item>
+        <item>funds received</item>
+        <item>bank deposit</item>
+        <item>money in</item>
+        <item>funds in</item>
+        <item>inbound</item>
+    </string-array>
+
+    <string-array name="collect_interest_category_synonyms">
+        <item>collect interest</item>
+        <item>interest income</item>
+        <item>interest earned</item>
+        <item>earn interest</item>
+        <item>interest revenue</item>
+        <item>accrued interest</item>
+        <item>interest gain</item>
+        <item>interest payment</item>
+        <item>interest collection</item>
+        <item>interest return</item>
+    </string-array>
+
+    <string-array name="dateExpenseQueries">
+    <item>total expense today</item>
+    <item>total expense on {date}</item>
+    <item>total transactions on {date}</item>
+    </string-array>
+
+   <string-array name="balanceQueries">
+      <item>how much money do I have</item>
+      <item>wallet balance</item>
+      <item>main wallet balance</item>
+    </string-array>
+
+    <!-- Query patterns for Weekly Expense -->
+    <string-array name="weeklyQueries">
+      <item>total expense this week</item>
+      <item>expense this week</item>
+      <item>spend this week</item>
+    </string-array>
+
+    <!-- Query patterns for Monthly Expense -->
+    <string-array name="monthlyQueries">
+      <item>total expense this month</item>
+      <item>expense this month</item>
+      <item>spend this month</item>
+    </string-array>
+
+    <!-- Query patterns for Category Expense -->
+    <string-array name="categoryExpenseQueries">
+      <item>expense for {category}</item>
+      <item>spend on {category}</item>
+      <item>spending on {category}</item>
+    </string-array>
+
+    <!-- Query patterns for Today's Income -->
+    <string-array name="incomeQueries">
+      <item>income today</item>
+      <item>how much did I earn today</item>
+      <item>thu nhập hôm nay</item>
+    </string-array>
+
+    <!-- Query patterns for Top Spending Category -->
+    <string-array name="topCategoryQueries">
+      <item>top spending category today</item>
+      <item>top category today</item>
+      <item>danh mục chi nhiều nhất hôm nay</item>
+    </string-array>
+
+    <!-- Query patterns for Budget Usage -->
+    <string-array name="budgetUsageQueries">
+      <item>budget usage today</item>
+      <item>tiến độ ngân sách</item>
+      <item>budget progress</item>
+    </string-array>
+
+    <!-- Feature shortcut queries -->
+    <string-array name="budget_feature_synonyms">
+        <item>show budget</item>
+        <item>open budget</item>
+        <item>budget screen</item>
+        <item>budgets</item>
+        <item>budget management</item>
+        <item>running budgets</item>
+        <item>view budgets</item>
+        <item>budget list</item>
+    </string-array>
+
+    <string-array name="account_feature_synonyms">
+        <item>show account</item>
+        <item>open account</item>
+        <item>account screen</item>
+        <item>account settings</item>
+        <item>profile</item>
+        <item>my account</item>
+        <item>account management</item>
+        <item>user account</item>
+    </string-array>
+
+    <string-array name="currency_feature_synonyms">
+        <item>show currency</item>
+        <item>open currency</item>
+        <item>currency screen</item>
+        <item>currency selection</item>
+        <item>select currency</item>
+        <item>change currency</item>
+        <item>currency list</item>
+        <item>currency settings</item>
+    </string-array>
+
+    <string-array name="debt_management_feature_synonyms">
+        <item>show debt management</item>
+        <item>open debt management</item>
+        <item>debt screen</item>
+        <item>manage debts</item>
+        <item>debt tracking</item>
+        <item>debt list</item>
+        <item>my debts</item>
+        <item>debt management</item>
+    </string-array>
+
+</resources>

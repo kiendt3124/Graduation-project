@@ -1,0 +1,263 @@
+[
+    {
+        "name": "food_&_beverage",
+        "title": "cate_food",
+        "icon": "ic_category_foodndrink",
+        "type": "expense",
+        "metadata": "foodndrink0",
+        "group": "required_expense"
+    },
+    
+    {
+        "name": "transportation",
+        "title": "cate_transport",
+        "icon": "ic_category_transport",
+        "type": "expense",
+        "metadata": "transport0",
+        "group": "required_expense"
+    },
+
+    {
+        "name": "rentals",
+        "title": "cate_rentals",
+        "icon": "icon_136",
+        "type": "expense",
+        "metadata": "rentals0",
+        "group": "required_expense"
+    },
+
+    {
+        "name": "water_bill",
+        "title": "cate_water",
+        "icon": "icon_124",
+        "type": "expense",
+        "metadata": "water0",
+        "group": "required_expense"
+    },
+
+    {
+        "name": "phone_bill",
+        "title": "cate_phone",
+        "icon": "icon_134",
+        "type": "expense",
+        "metadata": "phone0",
+        "group": "required_expense"
+    },
+
+    {
+        "name": "electricity_bill",
+        "title": "cate_electricity",
+        "icon": "icon_125",
+        "type": "expense",
+        "metadata": "electricity0",
+        "group": "required_expense"
+    },
+
+    {
+        "name": "gas_bill",
+        "title": "cate_gas",
+        "icon": "icon_139",
+        "type": "expense",
+        "metadata": "gas0",
+        "group": "required_expense"
+    },
+
+    {
+        "name": "television_bill",
+        "title": "cate_television",
+        "icon": "icon_84",
+        "type": "expense",
+        "metadata": "television0",
+        "group": "required_expense"
+    },
+
+    {
+        "name": "internet_bill",
+        "title": "cate_internet",
+        "icon": "icon_126",
+        "type": "expense",
+        "metadata": "internet0",
+        "group": "required_expense"
+    },
+    
+    {
+        "name": "other_utility_bill",
+        "title": "cate_other_utility_bill",
+        "icon": "icon_138",
+        "type": "expense",
+        "metadata": "other_bill0",
+        "group": "required_expense"
+    },
+    
+    {
+        "name": "home_maintenance",
+        "title": "cate_home_maintenance",
+        "icon": "icon_29",
+        "type": "expense",
+        "metadata": "home_maintenance0",
+        "group": "up_and_comers"
+    },
+    
+    {
+        "name": "vehicle_maintenance",
+        "title": "cate_vehicle_maintenance",
+        "icon": "icon_130",
+        "type": "expense",
+        "metadata": "vehicle_maintenance0",
+        "group": "up_and_comers"
+    },
+    
+    {
+        "name": "medical_check_up",
+        "title": "cate_medical_check_up",
+        "icon": "ic_category_doctor",
+        "type": "expense",
+        "metadata": "medical_checkup0",
+        "group": "up_and_comers"
+    },
+
+    {
+        "name": "insurances",
+        "title": "cate_insurance",
+        "icon": "icon_137",
+        "type": "expense",
+        "metadata": "insurance0",
+        "group": "up_and_comers"
+    },
+
+    {
+        "name": "education",
+        "title": "cate_education",
+        "icon": "ic_category_education",
+        "type": "expense",
+        "metadata": "education0",
+        "group": "up_and_comers"
+    },
+    
+    {
+        "name": "houseware",
+        "title": "cate_houseware",
+        "icon": "icon_107",
+        "type": "expense",
+        "metadata": "houseware0",
+        "group": "up_and_comers"
+    },
+    
+    {
+        "name": "personal_items",
+        "title": "cate_personal_items",
+        "icon": "icon_41",
+        "type": "expense",
+        "metadata": "personal_items0",
+        "group": "up_and_comers"
+    },
+
+    {
+        "name": "pets",
+        "title": "cate_pets",
+        "icon": "icon_53",
+        "type": "expense",
+        "metadata": "pets0",
+        "group": "up_and_comers"
+    },
+    
+    {
+        "name": "home_services",
+        "title": "cate_home_services",
+        "icon": "icon_8",
+        "type": "expense",
+        "metadata": "home_service0",
+        "group": "up_and_comers"
+    },
+    
+    {
+        "name": "other_expense",
+        "title": "cate_expense_other",
+        "icon": "ic_category_other_expense",
+        "type": "expense",
+        "metadata": "IS_OTHER_EXPENSE",
+        "group": "up_and_comers"
+    },
+    
+    {
+        "name": "fitness",
+        "title": "cate_fitness",
+        "icon": "icon_70",
+        "type": "expense",
+        "metadata": "fitness0",
+        "group": "fun_and_relax"
+    },
+    
+    {
+        "name": "makeup",
+        "title": "cate_makeup",
+        "icon": "icon_63",
+        "type": "expense",
+        "metadata": "makeup0",
+        "group": "fun_and_relax"
+    },
+    
+    {
+        "name": "gifts_&_donations",
+        "title": "cate_donation",
+        "icon": "ic_category_donations",
+        "type": "expense",
+        "metadata": "gifts_donations0",
+        "group": "fun_and_relax"
+    },
+    
+    {
+        "name": "streaming_service",
+        "title": "cate_streaming_service",
+        "icon": "icon_94",
+        "type": "expense",
+        "metadata": "streaming_service0",
+        "group": "fun_and_relax"
+    },
+    
+    {
+        "name": "fun_money",
+        "title": "cate_fun_money",
+        "icon": "icon_49",
+        "type": "expense",
+        "metadata": "fun_money0",
+        "group": "fun_and_relax"
+    },
+
+    {
+        "name": "investment",
+        "title": "cate_invest",
+        "icon": "ic_category_invest",
+        "type": "expense",
+        "metadata": "invest0",
+        "group": "investing_and_debt_payments"
+    },
+
+    {
+        "name": "pay_interest",
+        "title": "cate_pay_interest",
+        "icon": "icon_4",
+        "type": "expense",
+        "metadata": "IS_PAY_INTEREST",
+        "group": "investing_and_debt_payments"
+    },
+
+    {
+        "name": "outgoing_transfer",
+        "title": "cate_outgoing_transfer",
+        "icon": "icon_142",
+        "type": "expense",
+        "metadata": "IS_OUTGOING_TRANSFER",
+        "group": "others"
+    },
+
+    {
+        "name": "incoming_transfer",
+        "title": "cate_incoming_transfer",
+        "icon": "icon_143",
+        "type": "income",
+        "metadata": "IS_INCOMING_TRANSFER",
+        "group": "others"
+    }
+    
+]

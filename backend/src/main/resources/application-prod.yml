@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      # Prefer validate/none + migrations in prod
+      ddl-auto: validate
+    show-sql: false
+
+logging:
+  level:
+    com.ptit.expensetracker.backend: INFO
+
+

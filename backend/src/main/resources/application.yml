@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: expense-tracker-backend
+
+  datasource:
+    # Production should inject SPRING_DATASOURCE_URL (e.g. Cloud SQL / managed DB)
+    # Local default:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/expensetracker}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      # In production prefer validate/none + migrations (Flyway/Liquibase)
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+
+server:
+  # Cloud Run injects PORT (usually 8080). Local default stays 8081.
+  port: ${PORT:8081}
+
+firebase:
+  # Set your Firebase project id here (optional; can be inferred from credentials)
+  project-id: ${FIREBASE_PROJECT_ID:}
+
+gemini:
+  # IMPORTANT: never hardcode API keys in git. Inject via env or Secret Manager.
+  api-key: ${GEMINI_API_KEY:}
+  model: "gemini-2.5-flash"
+  base-url: "https://generativelanguage.googleapis.com"
+  # Enable ONLY for local debugging; can leak prompts/responses in logs.
+  http-wiretap: ${GEMINI_HTTP_WIRETAP:false}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    com.ptit.expensetracker.backend: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+

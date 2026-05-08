@@ -1,0 +1,23 @@
+[
+  {
+    "name":"withdrawal",
+    "title":"cate_withdrawal",
+    "icon":"icon_withdrawal",
+    "type":"expense",
+    "metadata":"IS_WITHDRAWAL"
+  },
+  {
+    "name":"deposit",
+    "title":"cate_deposit",
+    "icon":"icon_143",
+    "type":"income",
+    "metadata":"IS_DEPOSIT"
+  },
+  {
+    "name":"interest",
+    "title":"cate_interest",
+    "icon":"ic_category_interestmoney",
+    "type":"income",
+    "metadata":"IS_INTEREST"
+  }
+]
