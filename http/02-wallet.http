@@ -1,0 +1,121 @@
+### ============================================================
+### WALLET MODULE — Quản lý ví tiền
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > googleLogin trước để có accessToken
+
+### 1. Tạo ví tiền mặt
+# @name createCashWallet
+POST {{host}}/api/wallets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Tiền mặt",
+  "balance": 5000000,
+  "walletType": "CASH"
+}
+
+> {%
+    client.test("Tạo ví thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("walletId", response.body.id);
+        client.log("✅ walletId = " + response.body.id);
+    }
+%}
+
+###
+
+### 2. Tạo ví ngân hàng
+# @name createBankWallet
+POST {{host}}/api/wallets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Vietcombank",
+  "balance": 10000000,
+  "walletType": "BANK_ACCOUNT"
+}
+
+> {%
+    if (response.status === 200) {
+        client.global.set("bankWalletId", response.body.id);
+        client.log("✅ bankWalletId = " + response.body.id);
+    }
+%}
+
+###
+
+### 3. Lấy danh sách tất cả ví
+# @name getAllWallets
+GET {{host}}/api/wallets
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh sách ví thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.length >= 0, "Body phải là mảng");
+    });
+%}
+
+###
+
+### 4. Cập nhật ví
+# @name updateWallet
+PATCH {{host}}/api/wallets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "id": "{{walletId}}",
+  "name": "Tiền mặt (đã cập nhật)",
+  "balance": 6000000
+}
+
+> {%
+    client.test("Cập nhật ví thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5. Tạo ví tạm để test xóa
+# @name createTempWallet
+POST {{host}}/api/wallets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Ví tạm (sẽ xóa)",
+  "balance": 100,
+  "walletType": "CASH"
+}
+
+> {%
+    if (response.status === 200) {
+        client.global.set("tempWalletId", response.body.id);
+        client.log("✅ tempWalletId = " + response.body.id);
+    }
+%}
+
+###
+
+### 6. Xóa ví tạm (soft delete)
+### 💡 Xóa ví tạm, KHÔNG xóa ví chính (walletId) để các module khác dùng được
+# @name deleteWallet
+DELETE {{host}}/api/wallets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "id": "{{tempWalletId}}"
+}
+
+> {%
+    client.test("Xóa ví thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

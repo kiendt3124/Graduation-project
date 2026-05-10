@@ -1,0 +1,119 @@
+### ============================================================
+### PREMIUM MODULE — Mua và quản lý gói Premium
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > googleLogin trước để có accessToken
+
+### 1. Tạo đơn mua Premium (MONTHLY)
+# @name initiatePremiumMonthly
+POST {{host}}/premium/initiate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "plan": "MONTHLY"
+}
+
+> {%
+    client.test("Tạo đơn Premium thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("premiumTxnRef", response.body.txnRef);
+        client.log("✅ txnRef = " + response.body.txnRef);
+        client.log("✅ qrUrl = " + response.body.qrUrl);
+    }
+%}
+
+###
+
+### 2. Tạo đơn mua Premium (YEARLY)
+# @name initiatePremiumYearly
+POST {{host}}/premium/initiate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "plan": "YEARLY"
+}
+
+> {%
+    client.test("Tạo đơn Premium YEARLY thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3. Xem trạng thái Premium hiện tại
+# @name getPremiumStatus
+GET {{host}}/premium/status
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy trạng thái Premium thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("Tier: " + response.body.tier);
+        client.log("Expired: " + response.body.expired);
+    }
+%}
+
+###
+
+### 4. Lịch sử đơn mua Premium
+# @name getMyOrders
+GET {{host}}/premium/my-orders
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy lịch sử đơn Premium thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5. Test quyền Premium
+# @name testPremiumAccess
+GET {{host}}/premium/test
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Kiểm tra quyền Premium", function () {
+        // 200 = PREMIUM, 403 = BASIC
+        client.assert(response.status === 200 || response.status === 403, "Expected 200 or 403");
+    });
+    client.log("Tier: " + response.body.tier);
+    client.log("Message: " + response.body.message);
+%}
+
+###
+
+### 6. Webhook SePay (test thủ công)
+### ⚠️ Endpoint này thường do SePay gọi tự động, test thủ công bằng payload mẫu
+### 💡 Chạy "initiatePremiumMonthly" ở trên trước để có {{premiumTxnRef}}
+# @name webhookSePay
+POST {{host}}/premium/webhook
+Content-Type: application/json
+
+{
+  "id": 99999,
+  "gateway": "Vietcombank",
+  "transactionDate": "2026-04-29 10:00:00",
+  "accountNumber": "1234567890",
+  "code": null,
+  "content": "{{premiumTxnRef}}",
+  "transferType": "in",
+  "transferAmount": 49000,
+  "accumulated": 49000,
+  "subAccount": null,
+  "referenceCode": "TXN123456",
+  "description": "Thanh toán premium"
+}
+
+> {%
+    client.test("Webhook xử lý thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

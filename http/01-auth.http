@@ -1,0 +1,102 @@
+### ============================================================
+### AUTH MODULE — Đăng nhập, làm mới token, đăng xuất
+### ============================================================
+### 💡 DUY NHẤT 1 chỗ phải paste tay: Google ID Token ở bước 1
+###    Cách lấy: Mở file test-google-login.html trong browser
+###              → Đăng nhập Google → Copy ID Token → Paste vào dòng idToken bên dưới
+###    Sau khi chạy xong bước 1, TẤT CẢ các file khác đều tự động 100%
+
+### 1. Đăng nhập bằng Google
+### ⚠️ Paste Google ID Token vào đây (lấy từ test-google-login.html)
+# @name googleLogin
+POST {{host}}/google
+Content-Type: application/json
+
+{
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgwNzZkZGJhYjQxNTU1NmUxNjkxNTRjNmE0YTBiZGJkNDQ2OWI3OWMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI1NDc4ODAzODEwNDgtbGF1N3Q1bWxlODFkOWJhMW8wZWQ1MzJjM3F0aG1mYW0uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI1NDc4ODAzODEwNDgtbGF1N3Q1bWxlODFkOWJhMW8wZWQ1MzJjM3F0aG1mYW0uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDc3NDUzODg2MzMwNDQ3Njg5NzAiLCJlbWFpbCI6InZpZXRtdHJ1b25nQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYmYiOjE3Nzg0MjM1ODcsIm5hbWUiOiJWaeG7h3QgVHLGsMahbmciLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3BiZ2R5V3ZEVHgtVTdOOUpvdUhIUW51R2dmOUJNZTdpeUdtdjNUdTYxbzR3azd3PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IlZp4buHdCIsImZhbWlseV9uYW1lIjoiVHLGsMahbmciLCJpYXQiOjE3Nzg0MjM4ODcsImV4cCI6MTc3ODQyNzQ4NywianRpIjoiNzlmMmM2Njg4NDJlOWJiMjgzZTUxMGE5NDBmMDZjZGY2MDM1MWM4MiJ9.ASHj7Rhuh0CqT6DOV0cFUx7_Fh9EY_GDpbO3h6BbaqOxX6VQQIpGa_QwmDyUSqt7gsPsQWPYnXSAV7m6zx4yXm7px3haX1Hlj_AthRN2h_nRscHNuHkub4lAAeAzieaizCp_JTyEQtgn5H5xic92AJn65HaPt8YliEQ_QXjAbHvbocixZAV4woSrNTtQAJIYEr7uev8E0RBWmS8tywJFxKQgTncyK055z0bHmo0C8EsgAMgQygeC9bNC071oFClmHzhsXSb6vFgnjljfBO2m9ZRCz43M-ai_79Fhu3GlbEuW6g_aSTQWoRrWBg1OvO6D7EQiq-d_pS6TNb1DIxv1zA"
+}
+
+> {%
+    client.test("Google login thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.log("✅ Đã lưu accessToken & refreshToken");
+    }
+%}
+
+###
+
+### 2. Đăng nhập Admin
+# @name adminLogin
+POST {{host}}/admin/login
+Content-Type: application/json
+
+{
+  "username": "{{admin_username}}",
+  "password": "{{admin_password}}"
+}
+
+> {%
+    client.test("Admin login thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("adminToken", response.body.accessToken);
+        client.global.set("adminRefreshToken", response.body.refreshToken);
+        client.log("✅ Đã lưu adminToken");
+    }
+%}
+
+###
+
+### 3. Làm mới access token
+# @name refreshToken
+POST {{host}}/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.test("Refresh token thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.log("✅ Đã cập nhật token mới");
+    }
+%}
+
+###
+
+### 4. Kiểm tra token (me)
+GET {{host}}/me
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Token hợp lệ", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5. Đăng xuất
+POST {{host}}/logout
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.test("Logout thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

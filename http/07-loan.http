@@ -1,0 +1,174 @@
+### ============================================================
+### LOAN MODULE — Quản lý khoản vay & lịch sử thanh toán
+### ============================================================
+### ⚠️ Yêu cầu: Chạy trước:
+###   01-auth.http > googleLogin
+###   02-wallet.http > createCashWallet (để có walletId cho payments)
+
+### 1. Tạo khoản vay (BORROW — mình nợ người khác)
+# @name createBorrowLoan
+POST {{host}}/api/loans
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "counterpart": "Nguyễn Văn A",
+  "loanType": "BORROW",
+  "principalAmount": 10000000,
+  "interestRate": 12.0,
+  "startDate": "2026-04-01",
+  "dueDate": "2026-10-01",
+  "note": "Vay mua laptop"
+}
+
+> {%
+    client.test("Tạo khoản vay BORROW thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("loanId", response.body.id);
+        client.log("✅ loanId = " + response.body.id);
+    }
+%}
+
+###
+
+### 2. Tạo khoản cho vay (LEND — mình cho vay)
+# @name createLendLoan
+POST {{host}}/api/loans
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "counterpart": "Trần Thị B",
+  "loanType": "LEND",
+  "principalAmount": 5000000,
+  "startDate": "2026-03-15",
+  "dueDate": "2026-06-15",
+  "note": "Cho bạn mượn tiền"
+}
+
+> {%
+    client.test("Tạo khoản cho vay LEND thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3. Lấy danh sách khoản vay (tất cả)
+# @name getAllLoans
+GET {{host}}/api/loans
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh sách khoản vay thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 4. Lấy khoản vay — filter theo type
+# @name getLoansByType
+GET {{host}}/api/loans?type=BORROW
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Filter khoản vay theo type thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5. Lấy khoản vay — filter theo status
+# @name getLoansByStatus
+GET {{host}}/api/loans?status=ACTIVE
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Filter khoản vay theo status thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 6. Xem chi tiết khoản vay
+# @name getLoanById
+GET {{host}}/api/loans/{{loanId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xem chi tiết khoản vay thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 7. Cập nhật khoản vay
+# @name updateLoan
+PATCH {{host}}/api/loans/{{loanId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "counterpart": "Nguyễn Văn A (đã cập nhật)",
+  "note": "Vay mua laptop — đã thỏa thuận lại lãi suất",
+  "interestRate": 10.0
+}
+
+> {%
+    client.test("Cập nhật khoản vay thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 8. Ghi nhận thanh toán
+# @name addPayment
+POST {{host}}/api/loans/{{loanId}}/payments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "walletId": "{{walletId}}",
+  "amount": 2000000,
+  "paymentDate": "2026-04-29",
+  "note": "Trả lần 1"
+}
+
+> {%
+    client.test("Ghi nhận thanh toán thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 9. Lịch sử thanh toán
+# @name getPayments
+GET {{host}}/api/loans/{{loanId}}/payments
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy lịch sử thanh toán thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 10. Xóa khoản vay (soft delete)
+# @name deleteLoan
+DELETE {{host}}/api/loans/{{loanId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xóa khoản vay thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

@@ -1,0 +1,83 @@
+### ============================================================
+### REPORT MODULE — Báo cáo & Thống kê tài chính
+### ============================================================
+### ⚠️ Yêu cầu: Chạy trước:
+###   01-auth.http > googleLogin
+###   (Nên có dữ liệu giao dịch để báo cáo có nội dung)
+
+### 1. Tổng quan tài chính tháng
+# @name getSummary
+GET {{host}}/api/reports/summary?month=4&year=2026
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy tổng quan thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 2. Chi tiêu theo danh mục
+# @name getExpenseByCategory
+GET {{host}}/api/reports/expense-by-category?month=4&year=2026
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy chi tiêu theo danh mục thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3. Thu nhập theo danh mục
+# @name getIncomeByCategory
+GET {{host}}/api/reports/income-by-category?month=4&year=2026
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy thu nhập theo danh mục thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 4. Dòng tiền theo ngày
+# @name getCashFlowByDay
+GET {{host}}/api/reports/cash-flow?from=2026-04-01&to=2026-04-30
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy dòng tiền theo ngày thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5. Báo cáo 12 tháng trong năm
+# @name getMonthlyReport
+GET {{host}}/api/reports/monthly?year=2026
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy báo cáo 12 tháng thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.length === 12, "Phải có đủ 12 tháng");
+    });
+%}
+
+###
+
+### 6. So sánh ngân sách với thực chi
+# @name getBudgetVsActual
+GET {{host}}/api/reports/budget-vs-actual?month=4&year=2026
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy budget vs actual thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

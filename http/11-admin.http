@@ -1,0 +1,339 @@
+### ============================================================
+### ADMIN MODULE — Quản trị hệ thống (yêu cầu role ADMIN)
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > adminLogin trước để có adminToken
+
+### ═══════════════════════════════════════════════════════════
+### 1. QUẢN LÝ NGƯỜI DÙNG
+### ═══════════════════════════════════════════════════════════
+
+### 1.1 Danh sách người dùng (phân trang)
+# @name getUsers
+GET {{host}}/api/admin/users?page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy danh sách user thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    // Lưu userId đầu tiên để test các API khác
+    if (response.status === 200 && response.body.content && response.body.content.length > 0) {
+        client.global.set("testUserId", response.body.content[0].id);
+        client.log("✅ testUserId = " + response.body.content[0].id);
+    }
+%}
+
+###
+
+### 1.2 Tìm kiếm user theo email
+# @name searchUserByEmail
+GET {{host}}/api/admin/users?email=test@gmail.com&page=0&size=10
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Tìm kiếm user thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 1.3 Chi tiết người dùng
+# @name getUserDetail
+GET {{host}}/api/admin/users/{{testUserId}}
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy chi tiết user thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 1.4 Ban tài khoản
+# @name banUser
+PUT {{host}}/api/admin/users/{{testUserId}}/ban
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Ban user thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 1.5 Unban tài khoản
+# @name unbanUser
+PUT {{host}}/api/admin/users/{{testUserId}}/unban
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Unban user thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### ═══════════════════════════════════════════════════════════
+### 2. THỐNG KÊ HỆ THỐNG (Dashboard)
+### ═══════════════════════════════════════════════════════════
+
+### 2.1 Thống kê tổng quan
+# @name getSystemStats
+GET {{host}}/api/admin/stats
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy thống kê hệ thống thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 2.2 Thống kê xu hướng nâng cao
+# @name getTrends
+GET {{host}}/api/admin/stats/trends?year=2026
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy thống kê xu hướng thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### ═══════════════════════════════════════════════════════════
+### 3. QUẢN LÝ ĐƠN PREMIUM
+### ═══════════════════════════════════════════════════════════
+
+### 3.1 Danh sách đơn Premium (tất cả)
+# @name getPremiumOrders
+GET {{host}}/api/admin/premium/orders?page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy danh sách đơn Premium thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3.2 Danh sách đơn Premium — filter COMPLETED
+# @name getCompletedOrders
+GET {{host}}/api/admin/premium/orders?status=COMPLETED&page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Filter đơn COMPLETED thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3.3 Thống kê doanh thu Premium
+# @name getRevenue
+GET {{host}}/api/admin/premium/revenue?year=2026
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy thống kê doanh thu thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### ═══════════════════════════════════════════════════════════
+### 4. QUẢN LÝ DANH MỤC HỆ THỐNG
+### ═══════════════════════════════════════════════════════════
+
+### 4.1 Lấy tất cả danh mục (Admin view)
+# @name adminGetCategories
+GET {{host}}/api/admin/categories
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy danh mục (admin) thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 4.2 Tạo danh mục mới (EXPENSE)
+# @name adminCreateExpenseCategory
+POST {{host}}/api/admin/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Giải trí",
+  "icon": "🎮",
+  "transactionType": "EXPENSE"
+}
+
+> {%
+    client.test("Tạo danh mục EXPENSE thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("adminCategoryId", response.body.id);
+        client.global.set("expenseCategoryId", response.body.id);
+        client.log("✅ adminCategoryId = " + response.body.id);
+    }
+%}
+
+###
+
+### 4.3 Tạo danh mục mới (INCOME)
+### 💡 Chạy cái này để có incomeCategoryId cho module Transaction
+# @name adminCreateIncomeCategory
+POST {{host}}/api/admin/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Lương",
+  "icon": "💰",
+  "transactionType": "INCOME"
+}
+
+> {%
+    client.test("Tạo danh mục INCOME thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("incomeCategoryId", response.body.id);
+        client.log("✅ incomeCategoryId = " + response.body.id);
+    }
+%}
+
+###
+
+### 4.4 Cập nhật danh mục
+# @name adminUpdateCategory
+PATCH {{host}}/api/admin/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "id": "{{adminCategoryId}}",
+  "name": "Giải trí & Game",
+  "icon": "🎯"
+}
+
+> {%
+    client.test("Cập nhật danh mục thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 4.5 Xóa danh mục
+# @name adminDeleteCategory
+DELETE {{host}}/api/admin/categories/{{adminCategoryId}}
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Xóa danh mục thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### ═══════════════════════════════════════════════════════════
+### 5. QUẢN LÝ ĐỐI TÁC
+### ═══════════════════════════════════════════════════════════
+
+### 5.1 Lấy tất cả đối tác (Admin view)
+# @name adminGetAllPartners
+GET {{host}}/api/admin/partners
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Lấy đối tác (admin) thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5.2 Tạo đối tác mới
+# @name adminCreatePartner
+POST {{host}}/api/admin/partners
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Ngân hàng ABC Test",
+  "logoUrl": "https://example.com/logo.png",
+  "partnerType": "BANK",
+  "loanInterestRate": 8.5,
+  "savingInterestRate": 5.0,
+  "description": "Ngân hàng test tạo từ HTTP client"
+}
+
+> {%
+    client.test("Tạo đối tác thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("adminPartnerId", response.body.id);
+        client.log("✅ adminPartnerId = " + response.body.id);
+    }
+%}
+
+###
+
+### 5.3 Cập nhật đối tác
+# @name adminUpdatePartner
+PATCH {{host}}/api/admin/partners
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "id": "{{adminPartnerId}}",
+  "loanInterestRate": 9.0,
+  "description": "Đã cập nhật lãi suất vay"
+}
+
+> {%
+    client.test("Cập nhật đối tác thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5.4 Toggle hiển thị đối tác
+# @name adminTogglePartner
+PUT {{host}}/api/admin/partners/{{adminPartnerId}}/toggle
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Toggle đối tác thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5.5 Xóa đối tác
+# @name adminDeletePartner
+DELETE {{host}}/api/admin/partners/{{adminPartnerId}}
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Xóa đối tác thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

@@ -1,0 +1,152 @@
+### ============================================================
+### FINANCIAL GOAL MODULE — Mục tiêu tài chính & góp tiền
+### ============================================================
+### ⚠️ Yêu cầu: Chạy trước:
+###   01-auth.http > googleLogin
+###   02-wallet.http > createCashWallet (để có walletId)
+
+### 1. Tạo mục tiêu tài chính
+# @name createGoal
+POST {{host}}/api/goals
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Mua xe máy Honda",
+  "targetAmount": 30000000,
+  "deadline": "2026-12-31",
+  "note": "Tiết kiệm mua xe máy mới"
+}
+
+> {%
+    client.test("Tạo mục tiêu thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("goalId", response.body.id);
+        client.log("✅ goalId = " + response.body.id);
+    }
+%}
+
+###
+
+### 2. Lấy danh sách mục tiêu (tất cả)
+# @name getAllGoals
+GET {{host}}/api/goals
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh sách mục tiêu thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3. Lấy danh sách mục tiêu — filter ACTIVE
+# @name getActiveGoals
+GET {{host}}/api/goals?status=ACTIVE
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy mục tiêu ACTIVE thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 4. Xem chi tiết mục tiêu
+# @name getGoalById
+GET {{host}}/api/goals/{{goalId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xem chi tiết mục tiêu thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5. Cập nhật mục tiêu
+# @name updateGoal
+PATCH {{host}}/api/goals/{{goalId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Mua xe máy Honda Wave",
+  "targetAmount": 25000000,
+  "note": "Giảm target vì có khuyến mãi"
+}
+
+> {%
+    client.test("Cập nhật mục tiêu thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 6. Góp tiền vào mục tiêu
+# @name addContribution
+POST {{host}}/api/goals/{{goalId}}/contributions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "walletId": "{{walletId}}",
+  "amount": 5000000,
+  "contributionDate": "2026-04-29",
+  "note": "Góp tiền lần 1"
+}
+
+> {%
+    client.test("Góp tiền thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("contributionId", response.body.id);
+        client.log("✅ contributionId = " + response.body.id);
+    }
+%}
+
+###
+
+### 7. Lịch sử góp tiền
+# @name getContributions
+GET {{host}}/api/goals/{{goalId}}/contributions
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy lịch sử góp tiền thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 8. Xóa lần góp tiền
+# @name deleteContribution
+DELETE {{host}}/api/goals/{{goalId}}/contributions/{{contributionId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xóa lần góp tiền thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 9. Xóa mục tiêu (soft delete)
+# @name deleteGoal
+DELETE {{host}}/api/goals/{{goalId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xóa mục tiêu thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

@@ -52,5 +52,15 @@ public interface LoanRepository extends JpaRepository<Loan, UUID> {
     BigDecimal sumPrincipalByUserAndType(
             @Param("userId") UUID userId,
             @Param("loanType") LoanType loanType);
+
+    // ─── Queries phục vụ Scheduler ──────────────────────────────────────────
+
+    /** Tìm loan ACTIVE đã quá hạn (dùng cho scheduler cập nhật OVERDUE) */
+    List<Loan> findByStatusAndIsDeletedFalseAndDueDateBefore(
+            LoanStatus status, java.time.LocalDate date);
+
+    /** Tìm loan ACTIVE sắp đến hạn trong khoảng (dùng cho nhắc nhở LOAN_DUE_SOON) */
+    List<Loan> findByStatusAndIsDeletedFalseAndDueDateBetween(
+            LoanStatus status, java.time.LocalDate from, java.time.LocalDate to);
 }
 

@@ -105,5 +105,38 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     List<Object[]> sumGroupByMonth(
             @Param("userId") UUID userId,
             @Param("year") int year);
+
+    // ─── Queries phục vụ Admin Thống kê toàn hệ thống ─────────────────────────
+
+    /**
+     * Top danh mục chi tiêu (EXPENSE) nhiều nhất toàn platform (tất cả user gộp lại).
+     * Trả về: [categoryName, totalAmount, transactionCount]
+     */
+    @Query("""
+            SELECT t.category.name, COALESCE(SUM(t.amount), 0), COUNT(t)
+            FROM Transaction t
+            WHERE t.transactionType = com.example.graduationproject.Entity.Enum.TransactionType.EXPENSE
+              AND t.isDeleted = false
+              AND t.category IS NOT NULL
+            GROUP BY t.category.name
+            ORDER BY COALESCE(SUM(t.amount), 0) DESC
+            """)
+    List<Object[]> topExpenseCategoriesAllUsers();
+
+    /**
+     * Tổng số tiền thu vào (INCOME) và chi ra (EXPENSE) of the entire platform
+     * trong tháng/năm chỉ định.
+     * Trả về: [totalIncome, totalExpense]
+     */
+    @Query("""
+            SELECT
+              COALESCE(SUM(CASE WHEN t.transactionType = com.example.graduationproject.Entity.Enum.TransactionType.INCOME THEN t.amount ELSE 0 END), 0),
+              COALESCE(SUM(CASE WHEN t.transactionType = com.example.graduationproject.Entity.Enum.TransactionType.EXPENSE THEN t.amount ELSE 0 END), 0)
+            FROM Transaction t
+            WHERE t.isDeleted = false
+              AND MONTH(t.transactionDate) = :month
+              AND YEAR(t.transactionDate)  = :year
+            """)
+    Object[] platformIncomeExpenseByMonth(@Param("month") int month, @Param("year") int year);
 }
 

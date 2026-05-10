@@ -49,5 +49,11 @@ public interface PremiumOrderRepository extends JpaRepository<PremiumOrder, UUID
             ORDER BY MONTH(o.paidAt) ASC
             """)
     List<Object[]> revenueByMonth(@Param("year") int year);
+
+    // ─── Queries phục vụ Scheduler ──────────────────────────────────────────
+
+    /** Tìm đơn PENDING đã quá hạn (dùng cho scheduler expire) */
+    List<PremiumOrder> findByStatusAndExpiredAtBefore(
+            PremiumOrderStatus status, java.time.LocalDateTime dateTime);
 }
 

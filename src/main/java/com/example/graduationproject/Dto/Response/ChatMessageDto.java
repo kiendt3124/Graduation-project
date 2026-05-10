@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,14 +12,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GoalContributionResponse {
+public class ChatMessageDto {
 
     private UUID id;
-    private UUID goalId;
-    private UUID walletId;
-    private String walletName;
-    private BigDecimal amount;
-    private LocalDate contributionDate;
-    private String note;
+
+    /** "user" hoặc "assistant" */
+    private String role;
+
+    private String content;
+
     private LocalDateTime createdAt;
 }

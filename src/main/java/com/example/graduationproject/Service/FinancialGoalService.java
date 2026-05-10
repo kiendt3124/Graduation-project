@@ -68,12 +68,14 @@ public class FinancialGoalService {
             goals = goalRepository.findByUserIdAndIsDeletedFalse(user.getId());
         }
 
+        // Sắp xếp trên entity trước khi map — tránh unchecked cast trong lambda
+        goals.sort(Comparator
+                .comparingInt((FinancialGoal g) -> statusOrder(g.getStatus()))
+                .thenComparing(FinancialGoal::getDeadline,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+
         return goals.stream()
                 .map(this::toResponse)
-                .sorted(Comparator
-                        .comparingInt(r -> statusOrder(((FinancialGoalResponse) r).getStatus()))
-                        .thenComparing(r -> ((FinancialGoalResponse) r).getDeadline(),
-                                Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
     }
 
@@ -98,7 +100,14 @@ public class FinancialGoalService {
         }
 
         if (req.getName() != null)         goal.setName(req.getName());
-        if (req.getTargetAmount() != null) goal.setTargetAmount(req.getTargetAmount());
+        if (req.getTargetAmount() != null) {
+            goal.setTargetAmount(req.getTargetAmount());
+            // Kiểm tra lại: nếu cập nhật target xuống thấp hơn số tiền đã góp -> tự động COMPLETED
+            if (goal.getStatus() == GoalStatus.ACTIVE
+                    && goal.getCurrentAmount().compareTo(req.getTargetAmount()) >= 0) {
+                goal.setStatus(GoalStatus.COMPLETED);
+            }
+        }
         if (req.getDeadline() != null)     goal.setDeadline(req.getDeadline());
         if (req.getNote() != null)         goal.setNote(req.getNote());
 

@@ -208,12 +208,12 @@ public class PremiumService {
                 && user.getPremiumExpiredAt().isAfter(now);
 
         if (stillActive) {
-            // Gia hạn tiếp từ thời điểm hết hạn hiện tại
             base = user.getPremiumExpiredAt();
         } else {
             base = now;
         }
 
+        // Gia hạn tiếp từ thời điểm hết hạn hiện tại
         LocalDateTime newExpiry = (plan == PremiumPlan.MONTHLY)
                 ? base.plusDays(30)
                 : base.plusDays(365);

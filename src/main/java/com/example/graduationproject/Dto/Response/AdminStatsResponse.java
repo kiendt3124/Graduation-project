@@ -12,19 +12,30 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminStatsResponse {
-    // Tổng quan người dùng
+
+    // ─── Tổng quan người dùng ─────────────────────────────────────────────────
     private long totalUsers;
     private long totalBasicUsers;
     private long totalPremiumUsers;
     private long totalBannedUsers;
 
-    // Tổng quan Premium
+    // ─── Tổng quan Premium ────────────────────────────────────────────────────
     private long totalPremiumOrders;
     private long totalCompletedOrders;
     private long totalRevenue;              // VNĐ, tổng tất cả đơn COMPLETED
 
-    // Người dùng mới theo ngày (7 ngày gần nhất)
+    // ─── Người dùng mới 7 ngày gần nhất (theo ngày) ──────────────────────────
     private List<DailyNewUserStat> newUsersLast7Days;
+
+    // ─── Người dùng mới 30 ngày gần nhất (theo ngày) ─────────────────────────
+    private List<DailyNewUserStat> newUsersLast30Days;
+
+    // ─── Tần suất sử dụng tính năng ──────────────────────────────────────────
+    private FeatureUsageStat featureUsage;
+
+    // =========================================================================
+    // Nested classes
+    // =========================================================================
 
     @Data
     @Builder
@@ -34,4 +45,17 @@ public class AdminStatsResponse {
         private String date;   // "2026-04-18"
         private long count;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FeatureUsageStat {
+        private long totalTransactions;
+        private long totalWallets;
+        private long totalBudgets;
+        private long totalLoans;
+        private long totalGoals;
+    }
 }
+

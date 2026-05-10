@@ -27,5 +27,12 @@ public interface WalletRepository extends JpaRepository<Wallet, UUID> {
             WHERE w.user.id = :userId
             """)
     BigDecimal sumBalanceByUserId(@Param("userId") UUID userId);
+
+    /**
+     * Tổng số dư tất cả ví trong toàn hệ thống.
+     * Dùng cho admin dashboard (Ằ
+     */
+    @Query("SELECT COALESCE(SUM(w.balance), 0) FROM Wallet w")
+    BigDecimal sumBalanceAllWallets();
 }
 

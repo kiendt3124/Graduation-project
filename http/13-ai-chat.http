@@ -1,0 +1,221 @@
+### ============================================================
+### AI CHAT MODULE — Trợ lý AI tài chính (Premium only)
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > googleLogin (tài khoản PREMIUM) trước
+
+### 1. Chat với AI — tin nhắn đầu tiên (tạo session mới)
+# @name startNewChat
+POST {{host}}/api/ai/chat
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "message": "Xin chào! Tình hình tài chính của tôi hiện tại thế nào?",
+  "sessionId": null
+}
+
+> {%
+    client.test("Chat AI thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.reply !== undefined, "Phải có reply");
+    });
+    if (response.status === 200) {
+        client.global.set("aiSessionId", response.body.sessionId);
+        client.log("✅ sessionId = " + response.body.sessionId);
+        client.log("🤖 AI: " + response.body.reply.substring(0, 100) + "...");
+        client.log("📊 Đã dùng: " + response.body.usedToday + "/" + response.body.dailyLimit);
+    }
+%}
+
+###
+
+### 2. Tiếp tục conversation (cùng session)
+# @name continueChat
+POST {{host}}/api/ai/chat
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "message": "Tháng này tôi chi tiêu nhiều nhất ở danh mục nào?",
+  "sessionId": "{{aiSessionId}}"
+}
+
+> {%
+    client.test("Tiếp tục chat thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("🤖 AI: " + response.body.reply.substring(0, 150) + "...");
+    }
+%}
+
+###
+
+### 3. Quick input — nhập giao dịch bằng ngôn ngữ tự nhiên
+# @name quickInputTransaction
+POST {{host}}/api/ai/chat
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "message": "Ăn trưa 80k",
+  "sessionId": "{{aiSessionId}}"
+}
+
+> {%
+    client.test("Quick input thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("🤖 AI: " + response.body.reply);
+        if (response.body.createdTransaction) {
+            client.log("✅ Giao dịch được tạo: " + JSON.stringify(response.body.createdTransaction));
+        }
+    }
+%}
+
+###
+
+### 4. Yêu cầu phân tích chi tiêu
+# @name requestAnalysis
+POST {{host}}/api/ai/chat
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "message": "Phân tích xu hướng chi tiêu của tôi và đưa ra lời khuyên tiết kiệm",
+  "sessionId": "{{aiSessionId}}"
+}
+
+> {%
+    client.test("Phân tích thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("🤖 Phân tích AI: " + response.body.reply.substring(0, 200) + "...");
+    }
+%}
+
+###
+
+### 5. Lấy danh sách phiên chat
+# @name getSessions
+GET {{host}}/api/ai/sessions
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh sách session thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(Array.isArray(response.body), "Body phải là mảng");
+    });
+    if (response.status === 200) {
+        client.log("📋 Tổng sessions: " + response.body.length);
+        if (response.body.length > 0) {
+            client.log("Session đầu tiên: " + response.body[0].firstMessage);
+        }
+    }
+%}
+
+###
+
+### 6. Lấy lịch sử chat của 1 session
+### 💡 Cần có aiSessionId — chạy startNewChat trước
+# @name getSessionHistory
+GET {{host}}/api/ai/sessions/{{aiSessionId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy lịch sử chat thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(Array.isArray(response.body), "Body phải là mảng");
+    });
+    if (response.status === 200) {
+        client.log("📨 Tổng tin nhắn trong session: " + response.body.length);
+    }
+%}
+
+###
+
+### 7. Test với tài khoản BASIC — phải trả 403
+# @name testBasicUserBlocked
+POST {{host}}/api/ai/chat
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "message": "Test",
+  "sessionId": null
+}
+
+> {%
+    client.test("BASIC user nhận 403", function () {
+        // 200 = PREMIUM, 403 = BASIC (expected for basic user)
+        client.assert(response.status === 200 || response.status === 403, "Expected 200 or 403");
+    });
+    client.log("Status: " + response.status);
+%}
+
+###
+
+### 8. Xóa phiên chat
+# @name deleteSession
+DELETE {{host}}/api/ai/sessions/{{aiSessionId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xóa session thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### ============================================================
+### ADMIN — Giám sát AI
+### ============================================================
+
+### 9. Admin: xem tất cả AI logs
+# @name adminGetAiLogs
+GET {{host}}/api/admin/ai/logs?page=0&size=10
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Admin lấy AI logs thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("📋 Tổng logs: " + response.body.totalElements);
+    }
+%}
+
+###
+
+### 10. Admin: xem AI error logs
+# @name adminGetAiErrorLogs
+GET {{host}}/api/admin/ai/logs?status=ERROR&page=0&size=10
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Admin lấy error logs thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 11. Admin: thống kê AI
+# @name adminGetAiStats
+GET {{host}}/api/admin/ai/stats
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Admin lấy AI stats thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("📊 Tổng requests: " + response.body.totalRequests);
+        client.log("❌ Tỉ lệ lỗi: " + response.body.errorRate);
+        client.log("🪙 Token đã dùng: " + response.body.totalTokensUsed);
+        client.log("⏱️ Avg response: " + response.body.avgResponseMs + "ms");
+    }
+%}

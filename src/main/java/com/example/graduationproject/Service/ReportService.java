@@ -61,9 +61,9 @@ public class ReportService {
                 .sumPrincipalByUserAndType(userId, LoanType.LEND);
 
         long goalsInProgress = financialGoalRepository
-                .findByUserIdAndStatusAndIsDeletedFalse(userId, GoalStatus.ACTIVE).size();
+                .countByUserIdAndStatusAndIsDeletedFalse(userId, GoalStatus.ACTIVE);
         long goalsCompleted  = financialGoalRepository
-                .findByUserIdAndStatusAndIsDeletedFalse(userId, GoalStatus.COMPLETED).size();
+                .countByUserIdAndStatusAndIsDeletedFalse(userId, GoalStatus.COMPLETED);
 
         return ReportSummaryResponse.builder()
                 .month(month)

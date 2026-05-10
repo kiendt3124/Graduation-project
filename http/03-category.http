@@ -1,0 +1,46 @@
+### ============================================================
+### CATEGORY MODULE — Danh mục thu/chi (read-only cho end-user)
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > googleLogin trước để có accessToken
+
+### 1. Lấy tất cả danh mục
+# @name getAllCategories
+GET {{host}}/api/categories
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh mục thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.length > 0, "Phải có ít nhất 1 danh mục");
+    });
+    // Lưu category ID đầu tiên (EXPENSE) để dùng cho Transaction & Budget
+    if (response.status === 200 && response.body.length > 0) {
+        for (var i = 0; i < response.body.length; i++) {
+            if (response.body[i].transactionType === "EXPENSE") {
+                client.global.set("expenseCategoryId", response.body[i].id);
+                client.log("✅ expenseCategoryId = " + response.body[i].id);
+                break;
+            }
+        }
+        for (var j = 0; j < response.body.length; j++) {
+            if (response.body[j].transactionType === "INCOME") {
+                client.global.set("incomeCategoryId", response.body[j].id);
+                client.log("✅ incomeCategoryId = " + response.body[j].id);
+                break;
+            }
+        }
+    }
+%}
+
+###
+
+### 2. Lấy danh mục theo ID
+# @name getCategoryById
+GET {{host}}/api/categories/{{expenseCategoryId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh mục theo ID thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

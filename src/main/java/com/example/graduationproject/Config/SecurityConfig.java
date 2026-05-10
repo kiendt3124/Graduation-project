@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     private final JwtFilter jwtAuthFilter;
 
-    @Value("${cors.allowed-origins:http://localhost:3000}")
+    @Value("${cors.allowed-origins:http://localhost:5173}")
     private String allowedOriginsStr;
 
     @Bean
@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/google", "/refresh-token", "/logout", "/premium/webhook", "/admin/login").permitAll()
+                        .requestMatchers("/google", "/refresh-token", "/logout", "/premium/webhook", "/admin/login")
+                        .permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated());
 

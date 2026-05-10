@@ -63,4 +63,9 @@ public interface BudgetRepository extends JpaRepository<Budget, UUID> {
             @Param("categoryId") UUID categoryId,
             @Param("month") int month,
             @Param("year") int year);
+
+    // ─── Queries phục vụ Scheduler ──────────────────────────────────────────
+
+    /** Lấy tất cả budget của tháng/năm chỉ định (tất cả user) — dùng cho budget rollover */
+    List<Budget> findByMonthAndYear(int month, int year);
 }

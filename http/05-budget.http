@@ -1,0 +1,87 @@
+### ============================================================
+### BUDGET MODULE — Quản lý ngân sách chi tiêu theo tháng
+### ============================================================
+### ⚠️ Yêu cầu: Chạy trước:
+###   01-auth.http > googleLogin
+###   03-category.http > getAllCategories (để có expenseCategoryId)
+
+### 1. Tạo ngân sách
+# @name createBudget
+POST {{host}}/api/budgets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "categoryId": "{{expenseCategoryId}}",
+  "amount": 3000000,
+  "month": 6,
+  "year": 2026
+}
+
+> {%
+    client.test("Tạo ngân sách thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("budgetId", response.body.id);
+        client.log("✅ budgetId = " + response.body.id);
+    }
+%}
+
+###
+
+### 2. Xem ngân sách theo tháng
+# @name getBudgetsByMonth
+GET {{host}}/api/budgets?month=4&year=2026
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy ngân sách theo tháng thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3. Xem tất cả ngân sách
+# @name getAllBudgets
+GET {{host}}/api/budgets/all
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy tất cả ngân sách thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 4. Cập nhật hạn mức ngân sách
+# @name updateBudget
+PATCH {{host}}/api/budgets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "id": "{{budgetId}}",
+  "amount": 5000000
+}
+
+> {%
+    client.test("Cập nhật ngân sách thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 5. Xóa ngân sách
+# @name deleteBudget
+DELETE {{host}}/api/budgets/{{budgetId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xóa ngân sách thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

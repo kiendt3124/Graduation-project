@@ -1,0 +1,125 @@
+### ============================================================
+### TRANSACTION MODULE — Quản lý giao dịch thu/chi/chuyển khoản
+### ============================================================
+### ⚠️ Yêu cầu: Chạy trước:
+###   01-auth.http > googleLogin
+###   02-wallet.http > createCashWallet + createBankWallet
+###   03-category.http > getAllCategories (để có categoryId)
+
+### 1. Tạo giao dịch chi tiêu (EXPENSE)
+# @name createExpense
+POST {{host}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "walletId": "{{walletId}}",
+  "categoryId": "{{expenseCategoryId}}",
+  "amount": 150000,
+  "transactionType": "EXPENSE",
+  "transactionDate": "2026-04-29T10:30:00",
+  "note": "Ăn trưa"
+}
+
+> {%
+    client.test("Tạo giao dịch EXPENSE thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("transactionId", response.body.id);
+        client.log("✅ transactionId = " + response.body.id);
+    }
+%}
+
+###
+
+### 2. Tạo giao dịch thu nhập (INCOME)
+# @name createIncome
+POST {{host}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "walletId": "{{walletId}}",
+  "categoryId": "{{incomeCategoryId}}",
+  "amount": 20000000,
+  "transactionType": "INCOME",
+  "transactionDate": "2026-04-29T09:00:00",
+  "note": "Lương tháng 4"
+}
+
+> {%
+    client.test("Tạo giao dịch INCOME thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 3. Tạo giao dịch chuyển khoản (TRANSFER)
+# @name createTransfer
+POST {{host}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "walletId": "{{walletId}}",
+  "toWalletId": "{{bankWalletId}}",
+  "amount": 1000000,
+  "transactionType": "TRANSFER",
+  "transactionDate": "2026-04-29T11:00:00",
+  "note": "Chuyển tiền mặt sang ngân hàng"
+}
+
+> {%
+    client.test("Tạo giao dịch TRANSFER thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 4. Lấy danh sách giao dịch theo ví
+# @name getTransactionsByWallet
+GET {{host}}/api/transactions?walletId={{walletId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy giao dịch thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.length >= 0, "Body phải là mảng");
+    });
+%}
+
+###
+
+### 5. Cập nhật giao dịch
+# @name updateTransaction
+PATCH {{host}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "id": "{{transactionId}}",
+  "amount": 200000,
+  "note": "Ăn trưa (đã cập nhật)"
+}
+
+> {%
+    client.test("Cập nhật giao dịch thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
+
+###
+
+### 6. Xóa giao dịch (soft delete)
+# @name deleteTransaction
+DELETE {{host}}/api/transactions/{{transactionId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Xóa giao dịch thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

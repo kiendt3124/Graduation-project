@@ -1,12 +1,11 @@
 package com.example.graduationproject.Dto.Response;
 
+import com.example.graduationproject.Entity.Enum.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,14 +13,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GoalContributionResponse {
+public class NotificationResponse {
 
     private UUID id;
-    private UUID goalId;
-    private UUID walletId;
-    private String walletName;
-    private BigDecimal amount;
-    private LocalDate contributionDate;
-    private String note;
+    private NotificationType type;
+    private String title;
+    private String message;
+    private UUID referenceId;
+    private Boolean isRead;
     private LocalDateTime createdAt;
 }

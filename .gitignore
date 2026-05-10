@@ -36,3 +36,6 @@ build/
 .env
 .env.production
 !.env.example
+
+### Application Secrets ###
+src/main/resources/application.properties

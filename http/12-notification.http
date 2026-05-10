@@ -1,0 +1,67 @@
+### ============================================================
+### NOTIFICATION MODULE — Quản lý thông báo trong ứng dụng
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > googleLogin trước để có accessToken
+
+### 1. Lấy danh sách thông báo
+# @name getAllNotifications
+GET {{host}}/api/notifications
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh sách thông báo thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(Array.isArray(response.body), "Body phải là mảng");
+    });
+    if (response.status === 200 && response.body.length > 0) {
+        client.global.set("notificationId", response.body[0].id);
+        client.log("✅ notificationId = " + response.body[0].id);
+        client.log("📋 Tổng thông báo: " + response.body.length);
+    }
+%}
+
+###
+
+### 2. Đếm thông báo chưa đọc
+# @name getUnreadCount
+GET {{host}}/api/notifications/unread-count
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Đếm thông báo chưa đọc thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("🔔 Chưa đọc: " + response.body.unreadCount);
+    }
+%}
+
+###
+
+### 3. Đánh dấu 1 thông báo đã đọc
+### 💡 Cần có notificationId — chạy getAllNotifications trước
+# @name markAsRead
+PATCH {{host}}/api/notifications/{{notificationId}}/read
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Đánh dấu đã đọc thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.log("✅ isRead = " + response.body.isRead);
+    }
+%}
+
+###
+
+### 4. Đánh dấu tất cả đã đọc
+# @name markAllAsRead
+PATCH {{host}}/api/notifications/read-all
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Đánh dấu tất cả đã đọc thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}

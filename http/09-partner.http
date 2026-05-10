@@ -1,0 +1,15 @@
+### ============================================================
+### PARTNER MODULE — Danh sách đối tác (read-only cho end-user)
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > googleLogin trước để có accessToken
+
+### 1. Lấy danh sách đối tác đang hoạt động
+# @name getActivePartners
+GET {{host}}/api/partners
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Lấy danh sách đối tác thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+%}
