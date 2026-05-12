@@ -3,7 +3,9 @@ package com.example.graduationproject.Controller;
 import com.example.graduationproject.Dto.Request.CreateTransactionRequest;
 import com.example.graduationproject.Dto.Request.DeleteTransactionRequest;
 import com.example.graduationproject.Dto.Request.UpdateTransactionRequest;
+import com.example.graduationproject.Dto.Response.ScanReceiptResponse;
 import com.example.graduationproject.Dto.Response.TransactionResponse;
+import com.example.graduationproject.Service.ReceiptScanService;
 import com.example.graduationproject.Service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,9 +16,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +32,50 @@ import java.util.UUID;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final ReceiptScanService receiptScanService;
+
+    // ─── SCAN RECEIPT (AI Vision) ────────────────────────────────────────────
+
+    @Operation(
+        summary = "Scan hóa đơn bằng AI (Premium)",
+        description = """
+            Upload ảnh hóa đơn/biên lai → AI đọc và trích xuất thông tin tự động:
+            - **amount**: số tiền trên hóa đơn
+            - **suggestedCategoryName/Id**: danh mục gợi ý (match với DB)
+            - **merchantName**: tên cửa hàng
+            - **note**: mô tả ngắn
+            - **transactionDate**: ngày trên hóa đơn
+            - **imageUrl**: URL ảnh đã upload lên Cloudinary
+            
+            Client hiển thị form đã điền sẵn → User xác nhận → gọi `POST /api/transactions` để tạo.
+            
+            ⚠️ Chỉ dành cho user **PREMIUM**. File tối đa **5MB** (JPG/PNG/WebP).
+            """,
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Scan thành công",
+                content = @Content(schema = @Schema(implementation = ScanReceiptResponse.class))),
+            @ApiResponse(responseCode = "400", description = "File không hợp lệ (quá lớn, sai định dạng)"),
+            @ApiResponse(responseCode = "403", description = "Chỉ dành cho Premium user")
+        }
+    )
+    @PostMapping(value = "/scan-receipt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> scanReceipt(
+            @Parameter(description = "Ảnh hóa đơn (JPG/PNG/WebP, tối đa 5MB)", required = true)
+            @RequestParam("file") MultipartFile file) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            ScanReceiptResponse result = receiptScanService.scanReceipt(email, file);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            if ("PREMIUM_REQUIRED".equals(e.getMessage())) {
+                return ResponseEntity.status(403)
+                        .body("Tính năng scan hóa đơn chỉ dành cho tài khoản Premium.");
+            }
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // ─── CREATE ──────────────────────────────────────────────────────────────
 
     @Operation(
         summary = "Tạo giao dịch",

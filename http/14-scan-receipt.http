@@ -1,0 +1,98 @@
+### ============================================================
+### SCAN RECEIPT MODULE — Scan hóa đơn bằng AI (Premium only)
+### ============================================================
+### ⚠️ Yêu cầu: Chạy 01-auth.http > googleLogin (tài khoản PREMIUM) trước
+### Cần file ảnh hóa đơn: test-receipt.png (cùng thư mục http/)
+
+### 1. Scan hóa đơn — AI đọc ảnh và trích xuất thông tin
+# @name scanReceipt
+POST {{host}}/api/transactions/scan-receipt
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="test-receipt.png"
+Content-Type: image/png
+
+< ./test-receipt.png
+------WebKitFormBoundary--
+
+> {%
+    client.test("Scan hóa đơn thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        client.assert(response.body.imageUrl !== null, "Phải có imageUrl");
+    });
+    if (response.status === 200) {
+        client.log("✅ Scan thành công!");
+        client.log("💰 Số tiền: " + response.body.amount);
+        client.log("📁 Danh mục gợi ý: " + response.body.suggestedCategoryName);
+        client.log("🏪 Cửa hàng: " + response.body.merchantName);
+        client.log("📝 Ghi chú: " + response.body.note);
+        client.log("📅 Ngày: " + response.body.transactionDate);
+        client.log("🖼️ Ảnh: " + response.body.imageUrl);
+        client.log("🔑 CategoryId: " + response.body.suggestedCategoryId);
+
+        // Lưu kết quả để dùng ở bước 2
+        if (response.body.amount) client.global.set("scanAmount", response.body.amount);
+        if (response.body.suggestedCategoryId) client.global.set("scanCategoryId", response.body.suggestedCategoryId);
+        if (response.body.imageUrl) client.global.set("scanImageUrl", response.body.imageUrl);
+        if (response.body.transactionDate) client.global.set("scanDate", response.body.transactionDate);
+        if (response.body.note) client.global.set("scanNote", response.body.note);
+    }
+    if (response.status === 403) {
+        client.log("❌ Chỉ Premium user mới dùng được tính năng này");
+    }
+%}
+
+###
+
+### 2. Tạo giao dịch từ kết quả scan
+### ⚠️ Nếu AI không match được categoryId, thay bằng categoryId thật từ 03-category.http
+# @name createFromScan
+POST {{host}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "walletId": "{{walletId}}",
+  "categoryId": "{{expenseCategoryId}}",
+  "amount": {{scanAmount}},
+  "transactionType": "EXPENSE",
+  "transactionDate": "{{scanDate}}",
+  "note": "{{scanNote}}",
+  "imageUrl": "{{scanImageUrl}}"
+}
+
+> {%
+    client.test("Tạo giao dịch từ scan thành công", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+    });
+    if (response.status === 200) {
+        client.global.set("scanTransactionId", response.body.id);
+        client.log("✅ Tạo giao dịch thành công: " + response.body.id);
+        client.log("💰 Số tiền: " + response.body.amount);
+        client.log("📁 Danh mục: " + response.body.categoryName);
+        client.log("🖼️ Ảnh: " + response.body.imageUrl);
+    }
+%}
+
+###
+
+### 3. Xác nhận giao dịch vừa tạo có imageUrl
+# @name verifyImageUrl
+GET {{host}}/api/transactions?walletId={{walletId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("Giao dịch có imageUrl", function () {
+        client.assert(response.status === 200, "Expected 200 OK");
+        var txnId = client.global.get("scanTransactionId");
+        var found = response.body.find(function(t) { return t.id === txnId; });
+        if (found) {
+            client.assert(found.imageUrl !== null, "imageUrl phải tồn tại");
+            client.log("✅ imageUrl: " + found.imageUrl);
+        } else {
+            client.log("⚠️ Không tìm thấy giao dịch " + txnId);
+        }
+    });
+%}

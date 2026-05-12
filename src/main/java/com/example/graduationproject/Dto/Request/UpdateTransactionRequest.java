@@ -28,4 +28,7 @@ public class UpdateTransactionRequest {
 
     @Size(max = 500)
     private String note;
+
+    @Size(max = 500)
+    private String imageUrl;  // cho phép thêm/sửa ảnh hóa đơn
 }

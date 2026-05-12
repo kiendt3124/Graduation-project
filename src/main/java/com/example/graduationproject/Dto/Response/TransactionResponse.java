@@ -40,6 +40,7 @@ public class TransactionResponse {
     private TransactionType transactionType;
     private LocalDateTime transactionDate;
     private String note;
+    private String imageUrl;
     private Boolean isDeleted;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

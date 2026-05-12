@@ -60,6 +60,7 @@ public class TransactionService {
                     .transactionType(req.getTransactionType())
                     .transactionDate(req.getTransactionDate())
                     .note(req.getNote())
+                    .imageUrl(req.getImageUrl())
                     .build();
 
         } else {
@@ -88,6 +89,7 @@ public class TransactionService {
                     .transactionType(req.getTransactionType())
                     .transactionDate(req.getTransactionDate())
                     .note(req.getNote())
+                    .imageUrl(req.getImageUrl())
                     .build();
         }
 
@@ -154,6 +156,10 @@ public class TransactionService {
             transaction.setNote(req.getNote());
         }
 
+        if (req.getImageUrl() != null) {
+            transaction.setImageUrl(req.getImageUrl());
+        }
+
         transactionRepository.save(transaction);
         return toResponse(transaction);
     }
@@ -204,6 +210,7 @@ public class TransactionService {
                 .transactionType(t.getTransactionType())
                 .transactionDate(t.getTransactionDate())
                 .note(t.getNote())
+                .imageUrl(t.getImageUrl())
                 .isDeleted(t.getIsDeleted())
                 .createdAt(t.getCreatedAt())
                 .updatedAt(t.getUpdatedAt())

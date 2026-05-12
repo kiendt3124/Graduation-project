@@ -70,6 +70,12 @@ public class Transaction {
     private String note;
 
     /**
+     * URL ảnh hóa đơn (lưu trên Cloudinary).
+     */
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    /**
      * Soft delete flag.
      */
     @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")

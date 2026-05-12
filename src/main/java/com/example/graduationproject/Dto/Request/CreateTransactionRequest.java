@@ -32,4 +32,7 @@ public class CreateTransactionRequest {
     @Size(max = 500)
     private String note;
 
+    @Size(max = 500)
+    private String imageUrl;  // URL ảnh hóa đơn (tùy chọn)
+
 }
